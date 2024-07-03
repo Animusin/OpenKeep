@@ -172,6 +172,9 @@ GLOBAL_LIST_INIT(laws_of_the_land, initialize_laws_of_the_land())
 				return
 			if(findtext_char(message2recognize, "призвать корону"))
 				if(SSroguemachine.crown)
+					var/obj/item/clothing/head/roguetown/crown/serpcrown/I = SSroguemachine.crown
+					if(!I)
+						I = new /obj/item/clothing/head/roguetown/crown/serpcrown(src.loc)
 					if(ishuman(I.loc))
 						var/mob/living/carbon/human/HC = I.loc
 						if(HC.stat != DEAD)
