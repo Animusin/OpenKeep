@@ -563,18 +563,18 @@
 		var/mob/living/carbon/human/zaper = user
 		var/mob/living/carbon/human/victim = target
 		var/do_change
-		if(target.loc == user.loc)
+		if(victim.loc == zaper.loc)
 			do_change = TRUE
 		if(!do_change)
-			if(H.pulling == target)
+			if(zaper.pulling == victim)
 				do_change = TRUE
 		if(do_change)
-			if (victim.alert("Your character is gonna be zaped by [user.name]. Do you agree?","I want [target.name] to be zaped!","No, I don't") == "No, I don't")
-				zaper.alert("The player doesn't agree.")
-				log_game("The [target.name] doesn't agree to be zaped.")
+			if (alert(victim,"Your character is gonna be zaped by [zaper.name]. Do you agree?",,"I want [victim.name] to be zaped!","No, I don't") == "No, I don't")
+				alert(zaper,"The player doesn't agree.")
+				log_game("The [victim.name] doesn't agree to be zaped.")
 			else
-				zaper.alert("The player agrees.")
-				log_game("The [target.name] agrees to be zaped.")
+				alert(zaper,"The player agrees.")
+				log_game("The [victim.name] agrees to be zaped.")
 			return
 
 /datum/emote/living/spit
