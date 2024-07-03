@@ -560,7 +560,8 @@
 	if(!user || !target)
 		return
 	if(ishuman(user) && ishuman(target))
-		var/mob/living/carbon/human/H = user
+		var/mob/living/carbon/human/zaper = user
+		var/mob/living/carbon/human/victim = target
 		var/do_change
 		if(target.loc == user.loc)
 			do_change = TRUE
@@ -568,11 +569,11 @@
 			if(H.pulling == target)
 				do_change = TRUE
 		if(do_change)
-			if (target.alert("Your character is gonna be zaped by [user.name]. Do you agree?","I want [target.name] to be zaped!","No, I don't") == "No, I don't")
-				user.alert("The player doesn't agree.")
+			if (victim.alert("Your character is gonna be zaped by [user.name]. Do you agree?","I want [target.name] to be zaped!","No, I don't") == "No, I don't")
+				zaper.alert("The player doesn't agree.")
 				log_game("The [target.name] doesn't agree to be zaped.")
 			else
-				user.alert("The player agrees.")
+				zaper.alert("The player agrees.")
 				log_game("The [target.name] agrees to be zaped.")
 			return
 
