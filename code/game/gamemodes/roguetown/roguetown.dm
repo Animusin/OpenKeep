@@ -147,7 +147,7 @@ var/global/list/roguegamemodes = list("Rebellion", "Vampire Lord", "Extended", "
 				if("Extended")
 					log_game("Major Antagonist: Extended")
 		return TRUE
-	switch(majorpicked)
+	switch(2)
 		if(1)
 			pick_rebels()
 			log_game("Major Antagonist: Rebellion")
@@ -159,7 +159,7 @@ var/global/list/roguegamemodes = list("Rebellion", "Vampire Lord", "Extended", "
 			log_game("Major Antagonist: Vampire Lord")
 	minor_modes = shuffle(minor_modes)
 	for(var/m in minor_modes)
-		switch(m)
+		switch(1)
 			if(1)
 				pick_bandits()
 				log_game("Minor Antagonist: Bandit")
@@ -440,7 +440,7 @@ var/global/list/roguegamemodes = list("Rebellion", "Vampire Lord", "Extended", "
 		bandito.add_antag_datum(new_antag)
 		GLOB.pre_setup_antags -= bandito
 		bandits += bandito
-		//SSrole_class_handler.bandits_in_round = TRUE
+		SSrole_class_handler.bandits_in_round = TRUE
 ///////////////// ASPIRANTS
 	for(var/datum/mind/rogue in pre_aspirants) // Do the aspirant first, so the suppporter works right.
 		if(rogue.special_role == "Aspirant")
