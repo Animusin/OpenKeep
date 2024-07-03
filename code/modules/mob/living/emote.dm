@@ -569,7 +569,7 @@
 			if(zaper.pulling == victim)
 				do_change = TRUE
 		if(do_change)
-			if (alert(victim,"Your character is gonna be zaped by [zaper.name]. Do you agree?",,"I want [victim.name] to be zaped!","No, I don't") == "No, I don't")
+			if (alert(victim,"Your character is gonna be zaped by [zaper.name]. Do you agree?","Zape","I want [victim.name] to be zaped!","No, I don't") == "No, I don't")
 				alert(zaper,"The player doesn't agree.")
 				log_game("The [victim.name] doesn't agree to be zaped.")
 			else
