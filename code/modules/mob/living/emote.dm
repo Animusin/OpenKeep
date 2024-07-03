@@ -538,6 +538,41 @@
 				message_param = "kisses %t on \the [parse_zone(H.zone_selected)]."
 	playsound(target.loc, pick('sound/vo/kiss (1).ogg','sound/vo/kiss (2).ogg'), 100, FALSE, -1)
 
+/datum/emote/living/zape
+	key = "zape"
+	key_third_person = "zapes"
+	message = "looks hungrily."
+	message_param = "looks hungrily at %t."
+	emote_type = EMOTE_VISIBLE
+
+/mob/living/carbon/human/verb/emote_zape()
+	set name = "OOC: Ask Zape"
+	set category = "Emotes"
+
+	emote("zape", intentional = TRUE, targetted = TRUE)
+
+
+
+
+/datum/emote/living/zape/adjacentaction(mob/user, mob/target)
+	. = ..()
+	message_param = initial(message_param) // re
+	if(!user || !target)
+		return
+	if(ishuman(user) && ishuman(target))
+		var/mob/living/carbon/human/H = user
+		var/do_change
+		if(target.loc == user.loc)
+			do_change = TRUE
+		if(!do_change)
+			if(H.pulling == target)
+				do_change = TRUE
+		if(do_change)
+			if (target.alert("Your character is gonna be zaped by [user.name]. Do you agree?","I want [target.name] to be zaped!","No, I don't") == "No, I don't")
+				user.alert("The player doesn't agree.")
+			else
+				user.alert("The player agrees.")
+			return
 
 /datum/emote/living/spit
 	key = "spit"
