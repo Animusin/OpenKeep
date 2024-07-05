@@ -249,7 +249,7 @@
 /datum/keybinding/living/lookup/down(client/user)
 	var/mob/living/L = user.mob
 	if(!lastrest || world.time > lastrest + 15)
-		L.look_up()
+		L.look_up(client.pixel_z + 1)
 		lastrest = world.time
 		return TRUE
 	else

@@ -831,7 +831,7 @@
 	if(modifiers["middle"])
 		if(isliving(hud.mymob))
 			var/mob/living/L = hud.mymob
-			L.look_up()
+			L.look_up(client.pixel_z + 1)
 	update_icon()
 
 	if(modifiers["right"])
@@ -928,7 +928,7 @@
 	if(isliving(usr))
 		var/mob/living/L = usr
 		if(paramslist["right"])
-			L.look_up()
+			L.look_up(client.pixel_z + 1)
 		else
 			L.stand_up()
 
