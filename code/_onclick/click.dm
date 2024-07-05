@@ -835,7 +835,8 @@
 		return
 	if(A.Adjacent(src))
 		if(T == loc)
-			look_up(client.pixel_z + 1)
+			var/turf/temp = get_turf(client.eye)
+			look_up((temp.level - client.mob.z) + 1)
 		else
 			if(istransparentturf(T))
 				look_down(T)

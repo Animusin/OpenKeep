@@ -1873,7 +1873,7 @@
 		visible_message("<span class='info'>[src] looks up.</span>")
 	var/turf/T = get_turf(src)
 	var/turf/ceiling = T
-	for(var/i=1,i<step, ++i)
+	for(var/i=0,i<step, ++i)
 		ceiling = get_step_multiz(ceiling, UP)
 		
 		if(!ceiling) //We are at the highest z-level.
