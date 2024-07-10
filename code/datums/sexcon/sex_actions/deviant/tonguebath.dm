@@ -16,7 +16,7 @@
 	return TRUE
 
 /datum/sex_action/tonguebath/on_start(mob/living/carbon/human/user, mob/living/carbon/human/target)
-	user.visible_message(span_warning("[user] sticks their tongue out, getting close to [target]..."))
+	user.visible_message("<span class='danger'>[user] sticks their tongue out, getting close to [target]...</span>")
 
 /datum/sex_action/tonguebath/on_perform(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	user.visible_message(user.sexcon.spanify_force("[user] [user.sexcon.get_generic_force_adjective()] bathes [target]'s body with their tongue..."))
@@ -26,7 +26,7 @@
 	target.sexcon.handle_passive_ejaculation()
 
 /datum/sex_action/tonguebath/on_finish(mob/living/carbon/human/user, mob/living/carbon/human/target)
-	user.visible_message(span_warning("[user] stops bathing [target]'s body ..."))
+	user.visible_message("<span class='danger'>[user] stops bathing [target]'s body ...</span>")
 
 /datum/sex_action/tonguebath/is_finished(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	if(target.sexcon.finished_check())

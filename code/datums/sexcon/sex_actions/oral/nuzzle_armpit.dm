@@ -16,10 +16,10 @@
 	return TRUE
 
 /datum/sex_action/armpit_nuzzle/on_start(mob/living/carbon/human/user, mob/living/carbon/human/target)
-	user.visible_message(span_warning("[user] moves his head against [target]'s armpit..."))
+	user.visible_message("<span class='danger'>[user] moves his head against [target]'s armpit...</span>")
 
 /datum/sex_action/armpit_nuzzle/on_perform(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	user.visible_message(user.sexcon.spanify_force("[user] [user.sexcon.get_generic_force_adjective()] nuzzles [target]'s armpit..."))
 
 /datum/sex_action/armpit_nuzzle/on_finish(mob/living/carbon/human/user, mob/living/carbon/human/target)
-	user.visible_message(span_warning("[user] stops nuzzling [target]'s armpit..."))
+	user.visible_message("<span class='danger'>[user] stops nuzzling [target]'s armpit...</span>")

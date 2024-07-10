@@ -18,7 +18,7 @@
 	return TRUE
 
 /datum/sex_action/force_rimming/on_start(mob/living/carbon/human/user, mob/living/carbon/human/target)
-	user.visible_message(span_warning("[user] shoves [target]'s head against his butt!"))
+	user.visible_message("<span class='danger'>[user] shoves [target]'s head against his butt!</span>")
 
 /datum/sex_action/force_rimming/on_perform(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	user.visible_message(user.sexcon.spanify_force("[user] [user.sexcon.get_generic_force_adjective()] forces [target] to rim his butt."))
@@ -31,7 +31,7 @@
 	target.sexcon.handle_passive_ejaculation()
 
 /datum/sex_action/force_rimming/on_finish(mob/living/carbon/human/user, mob/living/carbon/human/target)
-	user.visible_message(span_warning("[user] pulls [target]'s head away from his butt."))
+	user.visible_message("<span class='danger'>[user] pulls [target]'s head away from his butt.</span>")
 
 /datum/sex_action/force_rimming/is_finished(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	if(user.sexcon.finished_check())

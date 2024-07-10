@@ -18,7 +18,7 @@
 	return TRUE
 
 /datum/sex_action/force_armpit_nuzzle/on_start(mob/living/carbon/human/user, mob/living/carbon/human/target)
-	user.visible_message(span_warning("[user] forces [target]'s head against their armpit!"))
+	user.visible_message("<span class='danger'>[user] forces [target]'s head against their armpit!</span>")
 
 /datum/sex_action/force_armpit_nuzzle/on_perform(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	user.visible_message(user.sexcon.spanify_force("[user] [user.sexcon.get_generic_force_adjective()] forces [target] to nuzzle their armpit."))
@@ -27,7 +27,7 @@
 	target.sexcon.handle_passive_ejaculation()
 
 /datum/sex_action/force_armpit_nuzzle/on_finish(mob/living/carbon/human/user, mob/living/carbon/human/target)
-	user.visible_message(span_warning("[user] pulls [target]'s head away from their armpit."))
+	user.visible_message("<span class='danger'>[user] pulls [target]'s head away from their armpit.</span>")
 
 /datum/sex_action/force_armpit_nuzzle/is_finished(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	if(user.sexcon.finished_check())

@@ -22,7 +22,7 @@
 	return TRUE
 
 /datum/sex_action/facesitting/on_start(mob/living/carbon/human/user, mob/living/carbon/human/target)
-	user.visible_message(span_warning("[user] sits their butt on [target]'s face!"))
+	user.visible_message("<span class='danger'>[user] sits their butt on [target]'s face!</span>")
 
 /datum/sex_action/facesitting/on_perform(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	var/verbstring = pick(list("rubs", "smushes", "forces"))
@@ -37,7 +37,7 @@
 	target.sexcon.handle_passive_ejaculation()
 
 /datum/sex_action/facesitting/on_finish(mob/living/carbon/human/user, mob/living/carbon/human/target)
-	user.visible_message(span_warning("[user] gets off [target]'s face."))
+	user.visible_message("<span class='danger'>[user] gets off [target]'s face.</span>")
 
 /datum/sex_action/facesitting/is_finished(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	if(user.sexcon.finished_check())

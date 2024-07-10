@@ -6,7 +6,7 @@
 /datum/sex_action/force_blowjob/shows_on_menu(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	if(user == target)
 		return FALSE
-	if(!user.getorganslot(ORGAN_SLOT_PENIS))
+	if(!user.gender == MALE)
 		return FALSE
 	return TRUE
 
@@ -17,14 +17,14 @@
 		return FALSE
 	if(!get_location_accessible(target, BODY_ZONE_PRECISE_MOUTH))
 		return FALSE
-	if(!user.getorganslot(ORGAN_SLOT_PENIS))
+	if(!user.gender == MALE)
 		return FALSE
 	if(!user.sexcon.can_use_penis())
 		return
 	return TRUE
 
 /datum/sex_action/force_blowjob/on_start(mob/living/carbon/human/user, mob/living/carbon/human/target)
-	user.visible_message(span_warning("[user] forces [target]'s head down to swallow and suck on his cock!"))
+	user.visible_message("<span class='danger'>[user] forces [target]'s head down to swallow and suck on his cock!</span>")
 	playsound(target, list('sound/misc/mat/insert (1).ogg','sound/misc/mat/insert (2).ogg'), 20, TRUE, ignore_walls = FALSE)
 
 /datum/sex_action/force_blowjob/on_perform(mob/living/carbon/human/user, mob/living/carbon/human/target)
@@ -33,7 +33,7 @@
 
 	user.sexcon.perform_sex_action(user, 2, 4, TRUE)
 	if(user.sexcon.check_active_ejaculation())
-		user.visible_message(span_love("cums into [target]'s throat!"))
+		user.visible_message("<span class='notice'>cums into [target]'s throat!</span>")
 		user.sexcon.cum_into()
 
 	user.sexcon.perform_deepthroat_oxyloss(user, 1.3)
@@ -41,7 +41,7 @@
 	target.sexcon.handle_passive_ejaculation()
 
 /datum/sex_action/force_blowjob/on_finish(mob/living/carbon/human/user, mob/living/carbon/human/target)
-	user.visible_message(span_warning("[user] pulls his cock out of [target]'s throat."))
+	user.visible_message("<span class='danger'>[user] pulls his cock out of [target]'s throat.</span>")
 
 /datum/sex_action/force_blowjob/is_finished(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	if(user.sexcon.finished_check())

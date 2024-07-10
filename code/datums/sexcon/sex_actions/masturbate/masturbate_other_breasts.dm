@@ -5,7 +5,7 @@
 /datum/sex_action/masturbate_other_breasts/shows_on_menu(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	if(user == target)
 		return FALSE
-	if(!target.getorganslot(ORGAN_SLOT_BREASTS))
+	if(!target.gender == FEMALE)
 		return FALSE
 	return TRUE
 
@@ -14,12 +14,12 @@
 		return FALSE
 	if(!get_location_accessible(target, BODY_ZONE_CHEST))
 		return FALSE
-	if(!target.getorganslot(ORGAN_SLOT_BREASTS))
+	if(!target.gender == FEMALE)
 		return FALSE
 	return TRUE
 
 /datum/sex_action/masturbate_other_breasts/on_start(mob/living/carbon/human/user, mob/living/carbon/human/target)
-	user.visible_message(span_warning("[user] starts rubbing [target]'s breasts..."))
+	user.visible_message("<span class='danger'>[user] starts rubbing [target]'s breasts...</span>")
 
 /datum/sex_action/masturbate_other_breasts/on_perform(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	user.visible_message(user.sexcon.spanify_force("[user] [user.sexcon.get_generic_force_adjective()] fondles [target]'s breasts..."))
@@ -28,7 +28,7 @@
 	target.sexcon.handle_passive_ejaculation()
 
 /datum/sex_action/masturbate_other_breasts/on_finish(mob/living/carbon/human/user, mob/living/carbon/human/target)
-	user.visible_message(span_warning("[user] stops stroking [target]'s breasts."))
+	user.visible_message("<span class='danger'>[user] stops stroking [target]'s breasts.</span>")
 
 /datum/sex_action/masturbate_other_breasts/is_finished(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	if(target.sexcon.finished_check())

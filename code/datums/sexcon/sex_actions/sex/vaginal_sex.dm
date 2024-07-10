@@ -5,9 +5,9 @@
 /datum/sex_action/vaginal_sex/shows_on_menu(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	if(user == target)
 		return FALSE
-	if(!target.getorganslot(ORGAN_SLOT_VAGINA))
+	if(!target.gender == FEMALE)
 		return FALSE
-	if(!user.getorganslot(ORGAN_SLOT_PENIS))
+	if(!user.gender == MALE)
 		return FALSE
 	return TRUE
 
@@ -18,16 +18,16 @@
 		return FALSE
 	if(!get_location_accessible(target, BODY_ZONE_PRECISE_GROIN))
 		return FALSE
-	if(!target.getorganslot(ORGAN_SLOT_VAGINA))
+	if(!target.gender == FEMALE)
 		return FALSE
-	if(!user.getorganslot(ORGAN_SLOT_PENIS))
+	if(!user.gender == MALE)
 		return FALSE
 	if(!user.sexcon.can_use_penis())
 		return
 	return TRUE
 
 /datum/sex_action/vaginal_sex/on_start(mob/living/carbon/human/user, mob/living/carbon/human/target)
-	user.visible_message(span_warning("[user] slides his cock into [target]'s cunt!"))
+	user.visible_message("<span class='danger'>[user] slides his cock into [target]'s cunt!</span>")
 	playsound(target, list('sound/misc/mat/insert (1).ogg','sound/misc/mat/insert (2).ogg'), 20, TRUE, ignore_walls = FALSE)
 
 /datum/sex_action/vaginal_sex/on_perform(mob/living/carbon/human/user, mob/living/carbon/human/target)
@@ -36,7 +36,7 @@
 
 	user.sexcon.perform_sex_action(user, 2, 0, TRUE)
 	if(user.sexcon.check_active_ejaculation())
-		user.visible_message(span_love("[user] cums into [target]'s cunt!"))
+		user.visible_message("<span class='notice'>[user] cums into [target]'s cunt!</span>")
 		user.sexcon.cum_into()
 		user.try_impregnate(target)
 		user.virginity = FALSE
@@ -46,7 +46,7 @@
 	target.sexcon.handle_passive_ejaculation()
 
 /datum/sex_action/vaginal_sex/on_finish(mob/living/carbon/human/user, mob/living/carbon/human/target)
-	user.visible_message(span_warning("[user] pulls his cock out of [target]'s cunt."))
+	user.visible_message("<span class='danger'>[user] pulls his cock out of [target]'s cunt.</span>")
 
 /datum/sex_action/vaginal_sex/is_finished(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	if(user.sexcon.finished_check())

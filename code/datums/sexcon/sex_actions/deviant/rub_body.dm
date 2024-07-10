@@ -17,7 +17,7 @@
 	return TRUE
 
 /datum/sex_action/rub_body/on_start(mob/living/carbon/human/user, mob/living/carbon/human/target)
-	user.visible_message(span_warning("[user] places their hands onto [target]..."))
+	user.visible_message("<span class='danger'>[user] places their hands onto [target]...</span>")
 
 /datum/sex_action/rub_body/on_perform(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	user.visible_message(user.sexcon.spanify_force("[user] [user.sexcon.get_generic_force_adjective()] rubs [target]'s body..."))
@@ -27,7 +27,7 @@
 	target.sexcon.handle_passive_ejaculation()
 
 /datum/sex_action/rub_body/on_finish(mob/living/carbon/human/user, mob/living/carbon/human/target)
-	user.visible_message(span_warning("[user] stops rubbing [target]'s body ..."))
+	user.visible_message("<span class='danger'>[user] stops rubbing [target]'s body ...</span>")
 
 /datum/sex_action/rub_body/is_finished(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	if(target.sexcon.finished_check())

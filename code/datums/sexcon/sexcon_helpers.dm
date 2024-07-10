@@ -34,7 +34,7 @@
 	volume = 20
 	extra_range = -4
 
-/mob/living
+/mob/
 	var/can_do_sex = TRUE
 	var/virginity = FALSE
 	var/deviant = FALSE
@@ -51,7 +51,17 @@
 		return
 	user.sexcon.start(src)
 
-/mob/living/proc/can_do_sex()
+/mob/proc/can_do_sex()
+	if(get_playerquality(client.ckey) <= -10)
+		can_do_sex = FALSE
+		return FALSE
+	if(!client.whitelisted())
+		can_do_sex = FALSE
+		return FALSE
+	if(client.blacklisted())
+		can_do_sex = FALSE
+		return FALSE
+	can_do_sex = TRUE
 	return TRUE
 
 /mob/living/carbon/human/proc/make_sucking_noise()
@@ -61,14 +71,21 @@
 		playsound(src, pick('sound/misc/mat/guymouth (1).ogg','sound/misc/mat/guymouth (2).ogg','sound/misc/mat/guymouth (3).ogg','sound/misc/mat/guymouth (4).ogg','sound/misc/mat/guymouth (5).ogg'), 35, TRUE, ignore_walls = FALSE)
 
 /mob/living/carbon/human/proc/try_impregnate(mob/living/carbon/human/wife)
-	var/obj/item/organ/testicles/testes = getorganslot(ORGAN_SLOT_TESTICLES)
-	if(!testes)
+	if(!gender == MALE)
 		return
-	var/obj/item/organ/vagina/vag = wife.getorganslot(ORGAN_SLOT_VAGINA)
-	if(!vag)
+	if(!wife.gender == FEMALE)
 		return
 	if(prob(25))
-		vag.be_impregnated(src)
+		wife.become_pregnant(src)
+
+/mob/living/carbon/human/proc/become_pregnant(husband)
+	if(QDELETED(src))
+		return
+	if(gender != FEMALE)
+		return
+	if(stat == DEAD)
+		return
+	add_nausea(101)
 
 /mob/living/carbon/human/proc/get_highest_grab_state_on(mob/living/carbon/human/victim)
 	var/grabstate = null

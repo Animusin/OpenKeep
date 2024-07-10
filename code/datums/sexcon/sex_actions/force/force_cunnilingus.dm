@@ -6,7 +6,7 @@
 /datum/sex_action/force_cunnilingus/shows_on_menu(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	if(user == target)
 		return FALSE
-	if(!user.getorganslot(ORGAN_SLOT_VAGINA))
+	if(!user.gender == FEMALE)
 		return FALSE
 	return TRUE
 
@@ -17,12 +17,12 @@
 		return FALSE
 	if(!get_location_accessible(target, BODY_ZONE_PRECISE_MOUTH))
 		return FALSE
-	if(!user.getorganslot(ORGAN_SLOT_VAGINA))
+	if(!user.gender == FEMALE)
 		return FALSE
 	return TRUE
 
 /datum/sex_action/force_cunnilingus/on_start(mob/living/carbon/human/user, mob/living/carbon/human/target)
-	user.visible_message(span_warning("[user] forces [target]'s head against her cunt!"))
+	user.visible_message("<span class='danger'>[user] forces [target]'s head against her cunt!</span>")
 
 /datum/sex_action/force_cunnilingus/on_perform(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	user.visible_message(user.sexcon.spanify_force("[user] [user.sexcon.get_generic_force_adjective()] forces [target] to suck her cunt."))
@@ -35,7 +35,7 @@
 	target.sexcon.handle_passive_ejaculation()
 
 /datum/sex_action/force_cunnilingus/on_finish(mob/living/carbon/human/user, mob/living/carbon/human/target)
-	user.visible_message(span_warning("[user] pulls [target]'s head away."))
+	user.visible_message("<span class='danger'>[user] pulls [target]'s head away.</span>")
 
 /datum/sex_action/force_cunnilingus/is_finished(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	if(user.sexcon.finished_check())

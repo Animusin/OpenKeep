@@ -75,8 +75,8 @@
 	if(user.client.prefs.violated[victim.mind.key] && user.client.prefs.violated[victim.mind.key] + VIOLATED_ALLOWED_TIME >= world.time)
 		return
 	var/pq_warning = pick(list("If I continue down this road, my soul will be burdened.", "I feel a terrible omen watching me...", "The forces of dark feel heavy on my soul."))
-	to_chat(user, span_userdanger(pq_warning))
-	user.visible_message(span_boldwarning("[user] begins to violate [victim]!"))
+	to_chat(user, "<span class='danger'>[pq_warning]</span>")
+	user.visible_message("<span class='danger'>[user] begins to violate [victim]!</span>")
 	if(!do_after(user, 5 SECONDS, target = victim))
 		return
 	if(!need_to_be_violated(victim))
@@ -90,9 +90,8 @@
 	if(user.client.prefs.violated[victim.mind.key] && user.client.prefs.violated[victim.mind.key] + VIOLATED_ALLOWED_TIME >= world.time)
 		return
 	// ZAPED
-	to_chat(user, span_boldwarning(pick(list("I feel tainted...", "I feel less human..."))))
+	to_chat(user, "<span class='danger'>[pick(list("I feel tainted...", "I feel less human..."))]</span>")
 	log_combat(user, victim, "Initiated rape against")
-	adjust_playerquality(-2, user.ckey, reason = "Initiated rape on an AFK/resisting person.")
 	user.client.prefs.violated[victim.mind.key] = world.time
 
 /datum/sex_controller/proc/adjust_speed(amt)
@@ -151,7 +150,7 @@
 
 /datum/sex_controller/proc/ejaculate()
 	log_combat(user, user, "Ejaculated")
-	user.visible_message(span_love("[user] makes a mess!"))
+	user.visible_message("<span class='notice'>[user] makes a mess!</span>")
 	playsound(user, 'sound/misc/mat/endout.ogg', 50, TRUE, ignore_walls = FALSE)
 	add_cum_floor(get_turf(user))
 	after_ejaculation()
@@ -169,12 +168,12 @@
 		if(!user.mob_timers["cumtri"])
 			user.mob_timers["cumtri"] = world.time
 			user.adjust_triumphs(1)
-			to_chat(user, span_love("Our loving is a true TRIUMPH!"))
+			to_chat(user, "<span class='notice'>Our loving is a true TRIUMPH!</span>")
 	if(HAS_TRAIT(user, TRAIT_GOODLOVER))
 		if(!target.mob_timers["cumtri"])
 			target.mob_timers["cumtri"] = world.time
 			target.adjust_triumphs(1)
-			to_chat(target, span_love("Our loving is a true TRIUMPH!"))
+			to_chat(target, "<span class='notice'>Our loving is a true TRIUMPH!</span>")
 
 /datum/sex_controller/proc/just_ejaculated()
 	return (last_ejaculation_time == world.time)
@@ -189,11 +188,11 @@
 	if(spent <= 0)
 		return
 	if(arousal > 60)
-		to_chat(user, span_warning("I'm too spent!"))
+		to_chat(user, "<span class='danger'>I'm too spent!</span>")
 		adjust_arousal(-20)
 	adjust_spent(-dt * SPENT_REDUCTION_RATE)
 	if(spent <= 0)
-		to_chat(user, span_notice("I feel like I'm not so spent anymore"))
+		to_chat(user, "<span class='notice'>I feel like I'm not so spent anymore</span>")
 	else
 		adjust_arousal(-dt * SPENT_AROUSAL_RATE)
 
@@ -298,19 +297,19 @@
 	last_pain = world.time
 	if(pain_amt >= PAIN_HIGH_EFFECT)
 		var/pain_msg = pick(list("IT HURTS!!!", "IT NEEDS TO STOP!!!", "I CAN'T TAKE IT ANYMORE!!!"))
-		to_chat(user, span_boldwarning(pain_msg))
+		to_chat(user, "<span class='danger'>[pain_msg]</span>")
 		user.flash_fullscreen("redflash2")
 		if(prob(70) && user.stat == CONSCIOUS)
-			user.visible_message(span_warning("[user] shudders in pain!"))
+			user.visible_message("<span class='danger'>[user] shudders in pain!</span>")
 	else if(pain_amt >= PAIN_MED_EFFECT)
 		var/pain_msg = pick(list("It hurts!", "It pains me!"))
-		to_chat(user, span_boldwarning(pain_msg))
+		to_chat(user, "<span class='danger'>[pain_msg]</span>")
 		user.flash_fullscreen("redflash1")
 		if(prob(40) && user.stat == CONSCIOUS)
-			user.visible_message(span_warning("[user] shudders in pain!"))
+			user.visible_message("<span class='danger'>[user] shudders in pain!</span>")
 	else
 		var/pain_msg = pick(list("It hurts a little...", "It stings...", "I'm aching..."))
-		to_chat(user, span_warning(pain_msg))
+		to_chat(user, "<span class='danger'>[pain_msg]</span>")
 
 /datum/sex_controller/proc/update_blueballs()
 	if(arousal >= BLUEBALLS_GAIN_THRESHOLD)
@@ -328,7 +327,7 @@
 	return TRUE
 
 /datum/sex_controller/proc/can_ejaculate()
-	if(!user.getorganslot(ORGAN_SLOT_TESTICLES) && !user.getorganslot(ORGAN_SLOT_VAGINA))
+	if(!user.gender == MALE && !user.gender == FEMALE)
 		return FALSE
 	if(HAS_TRAIT(user, TRAIT_LIMPDICK))
 		return FALSE

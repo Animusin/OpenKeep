@@ -5,7 +5,7 @@
 /datum/sex_action/masturbate_penis_over/shows_on_menu(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	if(user == target)
 		return FALSE
-	if(!user.getorganslot(ORGAN_SLOT_PENIS))
+	if(!user.gender == MALE)
 		return FALSE
 	return TRUE
 
@@ -14,14 +14,14 @@
 		return FALSE
 	if(!get_location_accessible(user, BODY_ZONE_PRECISE_GROIN))
 		return FALSE
-	if(!user.getorganslot(ORGAN_SLOT_PENIS))
+	if(!user.gender == MALE)
 		return FALSE
 	if(!user.sexcon.can_use_penis())
 		return
 	return TRUE
 
 /datum/sex_action/masturbate_penis_over/on_start(mob/living/carbon/human/user, mob/living/carbon/human/target)
-	user.visible_message(span_warning("[user] starts jerking over [target]..."))
+	user.visible_message("<span class='danger'>[user] starts jerking over [target]...</span>")
 
 /datum/sex_action/masturbate_penis_over/on_perform(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	var/chosen_verb = pick(list("jerks his cock", "strokes his cock", "masturbates", "jerks off"))
@@ -31,11 +31,11 @@
 	user.sexcon.perform_sex_action(user, 2, 4, TRUE)
 
 	if(user.sexcon.check_active_ejaculation())
-		user.visible_message(span_love("[user] cums over [target]'s body!"))
+		user.visible_message("<span class='notice'>[user] cums over [target]'s body!</span>")
 		user.sexcon.cum_onto()
 
 /datum/sex_action/masturbate_penis_over/on_finish(mob/living/carbon/human/user, mob/living/carbon/human/target)
-	user.visible_message(span_warning("[user] stops jerking off."))
+	user.visible_message("<span class='danger'>[user] stops jerking off.</span>")
 
 /datum/sex_action/masturbate_penis_over/is_finished(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	if(user.sexcon.finished_check())
