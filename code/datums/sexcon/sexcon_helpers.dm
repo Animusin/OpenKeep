@@ -73,7 +73,7 @@
 /mob/living/carbon/human/proc/try_impregnate(mob/living/carbon/human/wife)
 	if(!gender == MALE)
 		return
-	if(!wife.gender == FEMALE)
+	if(!(wife.gender == FEMALE))
 		return
 	if(prob(25))
 		wife.become_pregnant(src)

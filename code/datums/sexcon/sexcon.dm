@@ -44,6 +44,10 @@
 		return FALSE
 	if(!user.mind.key)
 		return FALSE
+	if(!victim.mind)
+		return FALSE
+	if(!victim.mind.key)
+		return FALSE		
 	if(!user.client.prefs.violated[victim.mind.key])
 		return FALSE
 	if(user.client.prefs.violated[victim.mind.key] + VIOLATED_ALLOWED_TIME < world.time)
@@ -327,7 +331,7 @@
 	return TRUE
 
 /datum/sex_controller/proc/can_ejaculate()
-	if(!user.gender == MALE && !user.gender == FEMALE)
+	if(!(user.gender == MALE) && !(user.gender == FEMALE))
 		return FALSE
 	if(HAS_TRAIT(user, TRAIT_LIMPDICK))
 		return FALSE

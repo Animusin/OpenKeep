@@ -5,16 +5,16 @@
 /datum/sex_action/masturbate_penis_over/shows_on_menu(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	if(user == target)
 		return FALSE
-	if(!user.gender == MALE)
+	if(!(user.gender == MALE))
 		return FALSE
 	return TRUE
 
 /datum/sex_action/masturbate_penis_over/can_perform(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	if(user == target)
 		return FALSE
-	if(!get_location_accessible(user, BODY_ZONE_PRECISE_GROIN))
+	if(!get_location_accessible(user, BODY_ZONE_PRECISE_GROIN, skipundies = FALSE))
 		return FALSE
-	if(!user.gender == MALE)
+	if(!(user.gender == MALE))
 		return FALSE
 	if(!user.sexcon.can_use_penis())
 		return

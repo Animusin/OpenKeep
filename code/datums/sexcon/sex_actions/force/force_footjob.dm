@@ -7,7 +7,7 @@
 /datum/sex_action/force_footjob/shows_on_menu(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	if(user == target)
 		return FALSE
-	if(!user.gender == MALE)
+	if(!(user.gender == MALE))
 		return
 	return TRUE
 
@@ -18,9 +18,9 @@
 		return FALSE
 	if(!get_location_accessible(target, BODY_ZONE_PRECISE_R_FOOT))
 		return FALSE
-	if(!get_location_accessible(user, BODY_ZONE_PRECISE_GROIN))
+	if(!get_location_accessible(user, BODY_ZONE_PRECISE_GROIN, skipundies = FALSE))
 		return FALSE
-	if(!user.gender == MALE)
+	if(!(user.gender == MALE))
 		return
 	return TRUE
 
