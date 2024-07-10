@@ -13,7 +13,7 @@
 	allowed_sexes = list(MALE)
 
 	tutorial = "The Priest is my shepard and I am their enforcer, I will do everything in my power to protect the church from evil and serve the priest at all costs. Should I capture evil they will confess their sins before the gods!"
-	whitelist_req = FALSE
+	whitelist_req = TRUE
 
 	outfit = /datum/outfit/job/roguetown/puritan
 	display_order = JDO_PURITAN
@@ -46,7 +46,7 @@
 	head = /obj/item/clothing/head/roguetown/puritan
 	gloves = /obj/item/clothing/gloves/roguetown/leather
 	beltl = /obj/item/rogueweapon/sword/rapier
-	backpack_contents = list(/obj/item/roguekey/church = 1)
+	backpack_contents = list(/obj/item/keyring/puritan = 1)
 
 	if(H.mind)
 		H.mind.adjust_skillrank(/datum/skill/misc/sewing, 2, TRUE)

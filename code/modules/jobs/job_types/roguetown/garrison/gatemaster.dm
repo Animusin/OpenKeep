@@ -12,11 +12,13 @@
 		"Elf",
 		"Half-Elf",
 		"Dwarf",
+		"Tiefling",
+		"Dark Elf",
 		"Aasimar"
 	)
 	tutorial = "You are an Archer in the Kings garrison and are used as a scout, or to man the walls and shoot at invaders."
 	display_order = JDO_GARRISONARCHER
-	whitelist_req = FALSE
+	whitelist_req = TRUE
 	bypass_lastclass = FALSE
 
 	outfit = /datum/outfit/job/roguetown/watchman
@@ -44,7 +46,7 @@
 		head = /obj/item/clothing/head/roguetown/helmet/kettle
 	else
 		head = /obj/item/clothing/head/roguetown/roguehood/red
-	
+
 	if(H.mind)
 		H.mind.adjust_skillrank(/datum/skill/combat/knives, 4, TRUE)
 		H.mind.adjust_skillrank(/datum/skill/combat/bows, 5, TRUE)
