@@ -394,9 +394,8 @@ GLOBAL_LIST_INIT(roleplay_readme, world.file2list("strings/rt/Lore_Primer.txt"))
 		return JOB_UNAVAILABLE_BANNED
 	if((!job.bypass_jobban) && (client.blacklisted()))
 		return JOB_UNAVAILABLE_GENERIC
-	if(CONFIG_GET(flag/usewhitelist))
-		if(job.whitelist_req && (!client.whitelisted()))
-			return JOB_UNAVAILABLE_GENERIC
+	if(job.whitelist_req && (!client.whitelisted()))
+		return JOB_UNAVAILABLE_GENERIC
 	if(QDELETED(src))
 		return JOB_UNAVAILABLE_GENERIC
 	if(!job.player_old_enough(client))
@@ -693,12 +692,6 @@ GLOBAL_LIST_INIT(roleplay_readme, world.file2list("strings/rt/Lore_Primer.txt"))
 	return
 
 /mob/living/carbon/human/after_creation()
-#ifdef MATURESERVER
-	if(gender == MALE)
-		sexcon = new/datum/sex_controller/male(src)
-	else
-		sexcon = new/datum/sex_controller/female(src)
-#endif
 	if(dna?.species)
 		dna.species.after_creation(src)
 	roll_stats()

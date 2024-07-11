@@ -122,6 +122,8 @@ GLOBAL_LIST_EMPTY(chosen_names)
 
 	var/anonymize = TRUE
 
+	var/list/violated = list()
+
 	var/lastclass
 
 	var/uplink_spawn_loc = UPLINK_PDA
@@ -1023,11 +1025,10 @@ GLOBAL_LIST_EMPTY(chosen_names)
 			if(!job.player_old_enough(user.client))
 				var/available_in_days = job.available_in_days(user.client)
 				HTML += "[used_name]</td> <td><font color=red> \[IN [(available_in_days)] DAYS\]</font></td></tr>"
+				continue			
+			if(job.whitelist_req && (!user.client.whitelisted()))
+				HTML += "<font color=#6183a5>[used_name]</font></td> <td> </td></tr>"
 				continue
-			if(CONFIG_GET(flag/usewhitelist))
-				if(job.whitelist_req && (!user.client.whitelisted()))
-					HTML += "<font color=#6183a5>[used_name]</font></td> <td> </td></tr>"
-					continue
 			if((!job.bypass_jobban) && (user.client.blacklisted()))
 				HTML += "<font color=#a36c63>[used_name]</font></td> <td> </td></tr>"
 				continue
