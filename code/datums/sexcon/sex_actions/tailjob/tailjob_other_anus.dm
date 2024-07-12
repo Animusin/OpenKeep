@@ -3,14 +3,16 @@
 	check_same_tile = FALSE
 
 /datum/sex_action/masturbate_other_anus/shows_on_menu(mob/living/carbon/human/user, mob/living/carbon/human/target)
-	if(user.dna.species?.id != "Tiefling")
+	var/mob/living/carbon/human/H = user
+	if(H.dna.species?.id != "Tiefling")
 		return FALSE
 	if(user == target)
 		return FALSE
 	return TRUE
 
 /datum/sex_action/masturbate_other_anus/can_perform(mob/living/carbon/human/user, mob/living/carbon/human/target)
-	if(user.dna.species?.id != "Tiefling")
+	var/mob/living/carbon/human/H = user
+	if(H.dna.species?.id != "Tiefling")
 		return FALSE
 	if(user == target)
 		return FALSE
