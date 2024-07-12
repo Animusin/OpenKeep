@@ -10,7 +10,7 @@
 		return FALSE
 	return TRUE
 
-/datum/sex_action/masturbate_breasts/can_perform(mob/living/user, mob/living/target)
+/datum/sex_action/masturbate_breasts/can_perform(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	if(user.dna.species?.id != "Tiefling")
 		return FALSE
 	if(user != target)
