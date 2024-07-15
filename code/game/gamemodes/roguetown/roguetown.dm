@@ -192,7 +192,7 @@ var/global/list/roguegamemodes = list("Rebellion", "Vampire Lord", "Extended", "
 	
 	var/list/aspirants = get_players_for_role(ROLE_ASPIRANT)
 	if(aspirants.len > 1)
-		for(var/asp in aspirants)
+		for(var/datum/mind/asp in aspirants)
 			if(asp.assigned_role in list("Prince", "Princess", "Captain", "Steward", "Hand"))
 				minor_modes |= 2
 	
@@ -212,6 +212,8 @@ var/global/list/roguegamemodes = list("Rebellion", "Vampire Lord", "Extended", "
 			if(3)
 				pick_lesser_vampires()
 				log_game("Minor Antagonist: Lesser vampire")
+		if(GetTownPower() - GetAntagPower() <= 1)
+			break
 	return TRUE
 
 /datum/game_mode/chaosmode/proc/pick_bandits()
@@ -554,10 +556,11 @@ var/global/list/roguegamemodes = list("Rebellion", "Vampire Lord", "Extended", "
 
 /datum/game_mode/chaosmode/proc/GetTownPower()
 	var/townpower = 1
-	var/list/towndefenders |= GLOB.garrison_positions
-	var/list/majordefenders |= "Captain"
-	var/list/majordefenders |= "Court Magician"
-	var/list/majordefenders |= "Priest"
+	var/list/towndefenders = list()
+	towndefenders = GLOB.garrison_positions
+	var/list/majordefenders = list("Captain")
+	majordefenders |= "Court Magician"
+	majordefenders |= "Priest"
 	for(var/mob/living/carbon/human/H in GLOB.human_list)
 		if(H.mind?.assigned_role)
 			if(H.mind.assigned_role in towndefenders)
@@ -575,18 +578,41 @@ var/global/list/roguegamemodes = list("Rebellion", "Vampire Lord", "Extended", "
 
 /datum/game_mode/chaosmode/make_antag_chance(mob/living/carbon/human/character) //klatejoin
 	var/banditcap = GetTownPower() - GetAntagPower() //GLOB.joined_player_list.len / 10
-	if(bandits.len >= 4) //Caps number of latejoin antagonists
+	var/vampirecap = GetTownPower() - GetAntagPower()
+	var/vampirelordalive = FALSE
+	for(var/mob/living/carbon/human/i in vampires)
+		var/datum/antagonist/vampirelord/lord = i.mind.has_antag_datum(/datum/antagonist/vampirelord)
+		if(!lord.isspawn)
+			vampirelordalive = TRUE
+	var/list/possibleroles = list()
+	if(ROLE_BANDIT in character.client.prefs.be_special)
+		possibleroles |= ROLE_BANDIT
+	if(ROLE_NBEAST in character.client.prefs.be_special)
+		possibleroles |= ROLE_NBEAST
+	var/pickedantag = pick(possibleroles)
+	if((bandits.len + vampires.len) >= 4) //Caps number of latejoin antagonists
 		return
 	if(bandits.len <= banditcap)
-		if(ROLE_BANDIT in character.client.prefs.be_special)
+		if(pickedantag == ROLE_BANDIT)
 			if(character.client.whitelisted())
 				if(age_check(character.client))
 					if(!(character.job in restricted_jobs))
-						var/datum/antagonist/villain/new_antag = new /datum/antagonist/bandit()
+						var/datum/antagonist/new_antag = new /datum/antagonist/bandit()
 						character.mind.add_antag_datum(new_antag)
 						bandits += character.mind
 						SSrole_class_handler.bandits_in_round = TRUE
 						banditgoal += rand(200,400)
+						return
+	if(vampires.len <= vampirecap)
+		if(pickedantag == ROLE_NBEAST && !vampirelordalive)
+			if(character.client.whitelisted())
+				if(age_check(character.client))
+					if(!(character.job in restricted_jobs))
+						var/datum/antagonist/new_antag = new /datum/antagonist/vampirelord/lesser()
+						character.mind.add_antag_datum(new_antag)
+						vampires += character.mind
+						lesser_vampires = TRUE
+						return
 	return
 //******** VILLAINS
 	var/num_villains = round((num_players() * 0.30)+1, 1)
