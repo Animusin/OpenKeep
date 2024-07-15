@@ -69,7 +69,10 @@ GLOBAL_LIST_EMPTY(vampire_objects)
 	vamp_look()
 	if(isspawn)
 		owner.current.verbs |= /mob/living/carbon/human/proc/disguise_button
-		add_objective(/datum/objective/vlordserve)
+		if(C.lesser_vampires == TRUE)
+			add_objective(/datum/objective/vlordsurvive)
+		else
+			add_objective(/datum/objective/vlordserve)
 		finalize_vampire_lesser()
 		for(var/obj/structure/vampire/bloodpool/mansion in GLOB.vampire_objects)
 			mypool = mansion
