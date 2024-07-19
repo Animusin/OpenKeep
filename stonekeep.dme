@@ -390,6 +390,7 @@
 #include "code\__DEFINES\sexcon_defines.dm"
 #include "code\datums\sexcon\sex_action.dm"
 #include "code\datums\sexcon\sexcon.dm"
+#include "code\datums\sexcon\pillory.dm"
 #include "code\datums\sexcon\sexcon_helpers.dm"
 #include "code\datums\sexcon\sex_actions\deviant\facesitting.dm"
 #include "code\datums\sexcon\sex_actions\deviant\footjob.dm"
