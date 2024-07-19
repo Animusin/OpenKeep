@@ -4,7 +4,7 @@
 	name = "Pillory"
 	desc = "To keep the criminals locked!"
 	icon_state = "pillory_single"
-	icon = '/icons/obj/pillory.dmi'
+	icon = 'icons/obj/pillory.dmi'
 	can_buckle = TRUE
 	max_buckled_mobs = 1
 	buckle_lying = 0
