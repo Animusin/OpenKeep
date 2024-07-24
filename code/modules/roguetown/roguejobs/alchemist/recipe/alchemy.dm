@@ -8,7 +8,7 @@
 /datum/crafting_recipe/roguetown/engineering/glass
 	name = "glass bottle"
 	reqs = list(
-		/obj/item/natural/dirtclod = 2,
+		/obj/item/natural/dirtclod = 2
 		)
 	result = /obj/item/reagent_containers/glass/bottle/rogue
 	tools = list(/obj/item/rogueweapon/tongs)
