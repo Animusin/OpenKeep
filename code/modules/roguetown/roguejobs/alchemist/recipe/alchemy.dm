@@ -40,7 +40,7 @@
 
 /datum/reagent/medicine/strengthpot/on_mob_life(mob/living/carbon/M)
 	if(!M.has_status_effect(/datum/status_effect/buff/strengthbuff))
-    	M.apply_status_effect(/datum/status_effect/buff/strengthbuff)
+		M.apply_status_effect(/datum/status_effect/buff/strengthbuff)
 	..()
 	. = 1
 
@@ -82,7 +82,7 @@
 
 /datum/reagent/medicine/speedpot/on_mob_life(mob/living/carbon/M)
 	if(!M.has_status_effect(/datum/status_effect/buff/speedbuff))
-    	M.apply_status_effect(/datum/status_effect/buff/speedbuff)
+		M.apply_status_effect(/datum/status_effect/buff/speedbuff)
 	..()
 	. = 1
 
@@ -124,7 +124,7 @@
 
 /datum/reagent/medicine/endurancepot/on_mob_life(mob/living/carbon/M)
 	if(!M.has_status_effect(/datum/status_effect/buff/endurancebuff))
-    	M.apply_status_effect(/datum/status_effect/buff/endurancebuff)
+		M.apply_status_effect(/datum/status_effect/buff/endurancebuff)
 	..()
 	. = 1
 
@@ -132,7 +132,7 @@
 	id = "endurancebuff"
 	alert_type = /atom/movable/screen/alert/status_effect/buff/endurancebuff
 	effectedstats = list("endurance" = 3, "constitution" = 3)
-	duration = 2 MINUTES
+	duration = 4 MINUTES
 
 /atom/movable/screen/alert/status_effect/buff/endurancebuff
 	name = "Potion of Bear Endurance"
@@ -166,7 +166,7 @@
 
 /datum/reagent/medicine/wisdompot/on_mob_life(mob/living/carbon/M)
 	if(!M.has_status_effect(/datum/status_effect/buff/wisdombuff))
-    	M.apply_status_effect(/datum/status_effect/buff/wisdombuff)
+		M.apply_status_effect(/datum/status_effect/buff/wisdombuff)
 	..()
 	. = 1
 
@@ -174,7 +174,7 @@
 	id = "wisdombuff"
 	alert_type = /atom/movable/screen/alert/status_effect/buff/wisdombuff
 	effectedstats = list("intelligence" = 3, "perception" = 3)
-	duration = 2 MINUTES
+	duration = 4 MINUTES
 
 /atom/movable/screen/alert/status_effect/buff/wisdombuff
 	name = "Potion of Owl Wisdom"
@@ -210,7 +210,7 @@
 
 /datum/reagent/medicine/luckpot/on_mob_life(mob/living/carbon/M)
 	if(!M.has_status_effect(/datum/status_effect/buff/luckbuff))
-    	M.apply_status_effect(/datum/status_effect/buff/luckbuff)
+		M.apply_status_effect(/datum/status_effect/buff/luckbuff)
 	..()
 	. = 1
 
