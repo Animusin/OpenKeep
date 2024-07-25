@@ -60,3 +60,23 @@
 	icon_state = "net_stockings_f"
 	gender = FEMALE
 	specuse = ALL_RACES_LIST
+
+/datum/crafting_recipe/roguetown/sewing/stockings
+    name = "male stockings"
+    result = list(/obj/item/stockings)
+    reqs = list(/obj/item/natural/cloth = 2,
+                /obj/item/natural/fibers = 1)
+    craftdiff = 0
+
+/datum/crafting_recipe/roguetown/sewing/stockings
+    name = "woman stockings"
+    result = list(/obj/item/stockings/f)
+    reqs = list(/obj/item/natural/cloth = 2,
+                /obj/item/natural/fibers = 1)
+    craftdiff = 0
+
+/datum/crafting_recipe/roguetown/sewing/net_stockings
+    name = "woman net stockings"
+    result = list(/obj/item/stockings/net)
+    reqs = list(/obj/item/natural/fibers = 2)
+    craftdiff = 0
