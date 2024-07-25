@@ -223,4 +223,4 @@
 	item_state = "net_stokings_f"
 	body_parts_covered = LEGS
 	allowed_sex = list(FEMALE)
-	allowed_race = list("human", "tiefling", "elf", "aasimar")
+	allowed_race = list("human", "tiefling", "elf", "aasimar")    
