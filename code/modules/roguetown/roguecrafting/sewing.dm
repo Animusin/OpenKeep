@@ -223,3 +223,16 @@
 	reqs = list(/obj/item/natural/fur = 2,
 				/obj/item/natural/hide = 4)
 	craftdiff = 5
+
+/datum/crafting_recipe/roguetown/sewing/stokings
+    name = "stokings"
+    result = list(/obj/item/clothing/under/roguetown/stokings)
+    reqs = list(/obj/item/natural/cloth = 2,
+                /obj/item/natural/fibers = 1)
+    craftdiff = 0
+
+/datum/crafting_recipe/roguetown/sewing/net_stokings
+    name = "net stokings"
+    result = list(/obj/item/clothing/under/roguetown/net_stokings)
+    reqs = list(/obj/item/natural/fibers = 2)
+    craftdiff = 0

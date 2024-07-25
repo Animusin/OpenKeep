@@ -206,3 +206,21 @@
 		if(get_detail_color())
 			pic.color = get_detail_color()
 		add_overlay(pic)
+
+/obj/item/clothing/under/roguetown/stokings
+	name = "stokings"
+	desc = "just stokings"
+	icon_state = "stokings"
+	item_state = "stokings_f"
+	body_parts_covered = LEGS
+	allowed_sex = list(FEMALE)
+	allowed_race = list("human", "tiefling", "elf", "aasimar")
+
+/obj/item/clothing/under/roguetown/net_stokings
+	name = "net stokings"
+	desc = "just net stokings"
+	icon_state = "net_stokings"
+	item_state = "net_stokings_f"
+	body_parts_covered = LEGS
+	allowed_sex = list(FEMALE)
+	allowed_race = list("human", "tiefling", "elf", "aasimar")
