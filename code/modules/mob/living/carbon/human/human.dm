@@ -41,7 +41,7 @@
 			return
 		if(user.zone_selected == BODY_ZONE_PRECISE_GROIN)
 			if(get_location_accessible(src, BODY_ZONE_PRECISE_GROIN, skipundies = TRUE))
-				if(underwear == "Nude")
+				if(underwear == "Nude" && socks = "Nude")
 					return
 				if(do_after(user, 30, needhand = 1, target = src))
 					cached_underwear = underwear
@@ -54,6 +54,17 @@
 						U = new/obj/item/undies/f(get_turf(src))
 					U.color = underwear_color
 					user.put_in_hands(U)
+					if(socks != "Nude")
+						socks = "Nude"
+						update_body()
+						var/obj/item/stockings/U
+						if(gender == MALE)
+							U = new/obj/item/stockings(get_turf(src))
+						else if(socks == "women's stockings")
+							U = new/obj/item/stockings/f(get_turf(src))
+						else
+							U = new/obj/item/stockings/net(get_turf(src))
+						U.color = underwear_color
 #endif
 
 /mob/living/carbon/human/Initialize()
@@ -342,6 +353,8 @@
 #ifdef MATURESERVER
 	if(get_location_accessible(src, BODY_ZONE_PRECISE_GROIN, skipundies = TRUE) && can_do_sex() && user.can_do_sex())
 		dat += "<tr><td><BR><B>Underwear:</B> <A href='?src=[REF(src)];undiesthing=1'>[underwear == "Nude" ? "Nothing" : "Remove"]</A></td></tr>"
+	if(get_location_accessible(src, BODY_ZONE_PRECISE_GROIN, skipundies = TRUE) && can_do_sex() && user.can_do_sex())
+		dat += "<tr><td><BR><B>Stockings:</B> <A href='?src=[REF(src)];stockings=1'>[socks == "Nude" ? "Nothing" : "Remove"]</A></td></tr>"
 #endif
 
 	dat += {"</table>"}

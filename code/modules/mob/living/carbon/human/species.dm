@@ -969,6 +969,27 @@ GLOBAL_LIST_EMPTY(roundstart_races)
 			if(socks)
 				standing += mutable_appearance(socks.icon, socks.icon_state, -BODY_LAYER)
 */
+		if(H.socks)
+			var/datum/sprite_accessory/socks/socks = GLOB.socks_list[H.socks]
+			var/mutable_appearance/socks_overlay
+			if(socks)
+				socks_overlay = mutable_appearance(socks.icon, socks.icon_state, -BODY_LAYER)
+				if(H.gender == FEMALE)
+					if(OFFSET_FACE_F in H.dna.species.offset_features)
+						socks_overlay.pixel_x += H.dna.species.offset_features[OFFSET_FACE_F][1]
+						socks_overlay.pixel_y += H.dna.species.offset_features[OFFSET_FACE_F][2]
+				else
+					if(OFFSET_FACE in H.dna.species.offset_features)
+						socks_overlay.pixel_x += H.dna.species.offset_features[OFFSET_FACE][1]
+						socks_overlay.pixel_y += H.dna.species.offset_features[OFFSET_FACE][2]
+				if(!socks.use_static)
+					if(H.underwear_color)
+						socks_overlay.color = H.underwear_color
+					else //default undies are brown
+						H.underwear_color = "#755f46"
+						socks_overlay.color = "#755f46"
+				standing += socks_overlay
+
 	if(standing.len)
 		H.overlays_standing[BODY_LAYER] = standing
 
