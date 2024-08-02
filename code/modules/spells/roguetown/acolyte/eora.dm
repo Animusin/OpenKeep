@@ -62,8 +62,8 @@
 	invocation_type = "whisper"
 	range = 1
 	cooldown_min = 200 //100 deciseconds reduction per rank
-	var/unconscious_amount_caster = 400 //how much the caster is stunned for after the spell
-	var/unconscious_amount_victim = 400 //how much the victim is stunned for after the spell
+	unconscious_amount_caster = 200 //how much the caster is stunned for after the spell
+	unconscious_amount_victim = 200 //how much the victim is stunned for after the spell
 	miracle = TRUE
 	devotion_cost = -100
 	action_icon_state = "mindswap"

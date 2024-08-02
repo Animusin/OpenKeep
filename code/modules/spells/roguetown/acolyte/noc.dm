@@ -68,8 +68,8 @@
 	range = 0
 	cooldown_min = 100
 	action_icon_state = "time"
-	var/timestop_range = 4
-	var/timestop_duration = 100
+	timestop_range = 4
+	timestop_duration = 100
 	miracle = TRUE
 	devotion_cost = -45
 
