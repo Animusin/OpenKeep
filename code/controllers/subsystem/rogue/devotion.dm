@@ -4,9 +4,9 @@
 #define CLERIC_T2 2
 #define CLERIC_T3 3
 
-#define CLERIC_REQ_1 100
-#define CLERIC_REQ_2 250
-#define CLERIC_REQ_3 500
+#define CLERIC_REQ_1 2
+#define CLERIC_REQ_2 3
+#define CLERIC_REQ_3 4
 
 // Cleric Holder Datums
 
@@ -14,7 +14,7 @@
 	var/holder_mob = null
 	var/patron = null
 	var/devotion = 0
-	var/max_devotion = 1000
+	var/max_devotion = 100
 	var/progression = 0
 	var/level = CLERIC_T0
 
@@ -39,21 +39,25 @@
 	if(!prog_amt) // no point in the rest if it's just an expenditure
 		return
 	progression += prog_amt
+	skill = holder_mob.mind?.get_skill_level(/datum/skill/magic/holy)
 	switch(level)
 		if(CLERIC_T0)
-			if(progression >= CLERIC_REQ_1)
+			if(skill >= CLERIC_REQ_1)
 				level = CLERIC_T1
 				usr.mind.AddSpell(new P.t1)
+				max_devotion += 30
 				return
 		if(CLERIC_T1)
-			if(progression >= CLERIC_REQ_2)
+			if(skill >= CLERIC_REQ_2)
 				level = CLERIC_T2
 				usr.mind.AddSpell(new P.t2)
+				max_devotion += 30
 				return
 		if(CLERIC_T2)
-			if(progression >= CLERIC_REQ_3)
+			if(skill >= CLERIC_REQ_3)
 				level = CLERIC_T3
 				usr.mind.AddSpell(new P.t3)
+				max_devotion += 30
 				return
 		if(CLERIC_T3) // already maxed out
 			return
@@ -70,7 +74,8 @@
 			continue
 		H.mind.AddSpell(new spell_type)
 	level = CLERIC_T3
-	update_devotion(300, 900)
+	update_devotion(100, 900)
+	max_devotion += 90
 
 /datum/devotion/cleric_holder/proc/grant_spells(mob/living/carbon/human/H)
 	if(!H || !H.mind)
@@ -129,8 +134,15 @@
 			if(C.devotion >= C.max_devotion)
 				to_chat(src, "<font color='red'>I have reached the limit of my devotion...</font>")
 				break
-			C.update_devotion(2, 2)
-			prayersesh += 2
+			if(var/obj/structure/fluff/psycross/S in oview(5, src))
+				C.update_devotion(8, 8)
+				prayersesh += 8
+			else if(var/obj/item/clothing/neck/roguetown/psicross/D in oview(5, src))
+				C.update_devotion(4, 4)
+				prayersesh += 4
+			else
+				C.update_devotion(2, 2)
+				prayersesh += 2
 		else
 			visible_message("[src] concludes their prayer.", "I conclude my prayer.")
 			to_chat(src, "<font color='purple'>I gained [prayersesh] devotion!</font>")

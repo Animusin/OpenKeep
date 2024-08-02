@@ -470,6 +470,8 @@ GLOBAL_LIST_INIT(spells, typesof(/obj/effect/proc_holder/spell)) //needed for th
 		var/mob/living/carbon/human/C = user
 		var/datum/devotion/cleric_holder/D = C.cleric
 		D.update_devotion(devotion_cost)
+		var/boon = user?.mind?.get_learning_boon(/datum/skill/magic/holy)
+		user.mind?.adjust_experience(/datum/skill/magic/holy, (user.STAINT*boon))
 	return
 
 /obj/effect/proc_holder/spell/proc/view_or_range(distance = world.view, center=usr, type="view")
