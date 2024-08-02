@@ -135,15 +135,13 @@
 			if(C.devotion >= C.max_devotion)
 				to_chat(src, "<font color='red'>I have reached the limit of my devotion...</font>")
 				break
-			if(var/obj/structure/fluff/psycross/S in oview(5, src))
-				C.update_devotion(8, 8)
-				prayersesh += 8
-			else if(var/obj/item/clothing/neck/roguetown/psicross/D in oview(5, src))
-				C.update_devotion(4, 4)
-				prayersesh += 4
-			else
-				C.update_devotion(2, 2)
-				prayersesh += 2
+			var/devotiongain = 2
+			for(var/obj/item/clothing/neck/roguetown/psicross/D in oview(5, src))
+				devotiongain = 4
+			for(var/obj/structure/fluff/psycross/S in oview(5, src))
+				devotiongain = 8
+			C.update_devotion(devotiongain, devotiongain)
+			prayersesh += devotiongain
 		else
 			visible_message("[src] concludes their prayer.", "I conclude my prayer.")
 			to_chat(src, "<font color='purple'>I gained [prayersesh] devotion!</font>")
