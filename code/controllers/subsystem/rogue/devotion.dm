@@ -39,7 +39,8 @@
 	if(!prog_amt) // no point in the rest if it's just an expenditure
 		return
 	progression += prog_amt
-	skill = holder_mob.mind?.get_skill_level(/datum/skill/magic/holy)
+	var/mob/living/carbon/human/H = holder_mob
+	var/skill = H.mind?.get_skill_level(/datum/skill/magic/holy)
 	switch(level)
 		if(CLERIC_T0)
 			if(skill >= CLERIC_REQ_1)
