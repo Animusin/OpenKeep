@@ -368,6 +368,14 @@ GLOBAL_LIST_INIT(roleplay_readme, world.file2list("strings/rt/Lore_Primer.txt"))
 		else
 			if(rank == "Death Knight")
 				return JOB_UNAVAILABLE_GENERIC
+		if(C.orks)
+			if(rank != "Ork")
+				return JOB_UNAVAILABLE_GENERIC
+			else
+				return JOB_AVAILABLE
+		else
+			if(rank == "Ork")
+				return JOB_UNAVAILABLE_GENERIC
 
 	var/datum/job/job = SSjob.GetJob(rank)
 	if(!job)
@@ -625,6 +633,13 @@ GLOBAL_LIST_INIT(roleplay_readme, world.file2list("strings/rt/Lore_Primer.txt"))
 					break
 				if(C.deathknightspawn)
 					dat += "<a class='job command' href='byond://?src=[REF(src)];SelectedJob=Death Knight'>JOIN THE VAMPIRE LORD AS A DEATH KNIGHT</a>"
+					dat += "</fieldset><br>"
+					column_counter++
+					if(column_counter > 0 && (column_counter % 3 == 0))
+						dat += "</td><td valign='top'>"
+					break
+				if(C.orks)
+					dat += "<a class='job command' href='byond://?src=[REF(src)];SelectedJob=Skeleton'>BECOME AN EVIL ORK RAIDER</a>"
 					dat += "</fieldset><br>"
 					column_counter++
 					if(column_counter > 0 && (column_counter % 3 == 0))

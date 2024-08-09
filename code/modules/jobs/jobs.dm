@@ -124,7 +124,8 @@ GLOBAL_LIST_INIT(peasant_positions, list(
 	"Pilgrim",
 	"Drifter",
 	"Skeleton",
-	"Death Knight"
+	"Death Knight",
+	"Ork"
 ))
 
 GLOBAL_LIST_INIT(chern_positions, list(

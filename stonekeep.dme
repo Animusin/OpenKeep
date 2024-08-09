@@ -2257,6 +2257,7 @@
 #include "code\modules\jobs\job_types\roguetown\nobility\steward.dm"
 #include "code\modules\jobs\job_types\roguetown\other\deathknight.dm"
 #include "code\modules\jobs\job_types\roguetown\other\mercenary.dm"
+#include "code\modules\jobs\job_types\roguetown\other\ork.dm"
 #include "code\modules\jobs\job_types\roguetown\other\skeleton.dm"
 #include "code\modules\jobs\job_types\roguetown\other\tester.dm"
 #include "code\modules\jobs\job_types\roguetown\other\merc_classes\blackoak.dm"

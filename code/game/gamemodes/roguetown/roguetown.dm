@@ -32,6 +32,7 @@ var/global/list/roguegamemodes = list("Rebellion", "Vampire Lord", "Extended", "
 	var/delfgoal = 1
 
 	var/skeletons = FALSE
+	var/orks = FALSE
 	var/lesser_vampires = FALSE
 
 	var/headrebdecree = FALSE
@@ -181,8 +182,9 @@ var/global/list/roguegamemodes = list("Rebellion", "Vampire Lord", "Extended", "
 		major_modes |= 0
 	var/majorpicked = pick(major_modes)
 	log_game("playersready: [playersready], majorpicked: [majorpicked]")
-	if(playersready <= 5)	
+	if(playersready <= 5)
 		majorpicked = 0
+	majorpicked = 5 //override event
 
 	switch(majorpicked)
 		if(0)
@@ -199,6 +201,9 @@ var/global/list/roguegamemodes = list("Rebellion", "Vampire Lord", "Extended", "
 		if(4)
 			pick_cultist()
 			log_game("Major Antagonist: Zizoid Cultists")
+		if(5)
+			orks = TRUE
+			log_game("Major Antagonist: Ork Raiders")
 
 	var/list/rogues = get_players_for_role(ROLE_BANDIT)
 	if(rogues.len > 0)
