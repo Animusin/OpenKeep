@@ -91,7 +91,7 @@
 	apply_overlay(BODY_LAYER)
 	dna.species.update_damage_overlays()
 
-/mob/living/carbon/human/species/orc/proc/update_wearable()
+/mob/living/carbon/human/proc/update_wearable()
 	remove_overlay(ARMOR_LAYER)
 
 	var/list/standing = list()
@@ -192,10 +192,10 @@
 	damage_overlay_type = ""
 	var/raceicon = "orc"
 
-/datum/species/orc/update_damage_overlays(var/mob/living/carbon/human/H)
+/datum/species/orc/update_damage_overlays(mob/living/carbon/human/H)
 	return
 
-/datum/species/orc/regenerate_icons(var/mob/living/carbon/human/H)
+/datum/species/orc/regenerate_icons(mob/living/carbon/human/H)
 //	H.cut_overlays()
 	H.icon_state = ""
 	if(H.notransform)
