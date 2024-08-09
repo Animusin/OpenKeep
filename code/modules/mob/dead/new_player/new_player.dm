@@ -369,7 +369,7 @@ GLOBAL_LIST_INIT(roleplay_readme, world.file2list("strings/rt/Lore_Primer.txt"))
 			if(rank == "Death Knight")
 				return JOB_UNAVAILABLE_GENERIC
 		if(C.orks)
-			if(rank != "Ork")
+			if(rank != "Ork" && rank != "Drifter")
 				return JOB_UNAVAILABLE_GENERIC
 			else
 				return JOB_AVAILABLE
