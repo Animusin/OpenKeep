@@ -639,7 +639,7 @@ GLOBAL_LIST_INIT(roleplay_readme, world.file2list("strings/rt/Lore_Primer.txt"))
 						dat += "</td><td valign='top'>"
 					break
 				if(C.orks)
-					dat += "<a class='job command' href='byond://?src=[REF(src)];SelectedJob=Skeleton'>BECOME AN EVIL ORK RAIDER</a>"
+					dat += "<a class='job command' href='byond://?src=[REF(src)];SelectedJob=Ork'>BECOME AN EVIL ORK RAIDER</a>"
 					dat += "</fieldset><br>"
 					column_counter++
 					if(column_counter > 0 && (column_counter % 3 == 0))
