@@ -8,7 +8,7 @@
 	confess_lines = list("RAVAGE!!!", "I WILL NOT LIVE IN YOUR WALLS!", "I WILL NOT FOLLOW YOUR RULES!")
 
 /datum/advclass/ork/ambush
-	name = "Ambush ork"
+	name = "Ambush Ork"
 	tutorial = ""
 	allowed_sexes = list(MALE)
 	outfit = /datum/outfit/job/roguetown/npc/orc/ambush
@@ -16,7 +16,7 @@
 	maximum_possible_slots = 5
 
 /datum/advclass/ork/tribal
-	name = "Tribal ork"
+	name = "Tribal Ork"
 	tutorial = ""
 	allowed_sexes = list(MALE)
 	outfit = /datum/outfit/job/roguetown/npc/orc/tribal
@@ -24,7 +24,7 @@
 	maximum_possible_slots = 5
 
 /datum/advclass/ork/warrior
-	name = "Warrior ork"
+	name = "Warrior Ork"
 	tutorial = ""
 	allowed_sexes = list(MALE)
 	outfit = /datum/outfit/job/roguetown/npc/orc/warrior
@@ -32,7 +32,7 @@
 	maximum_possible_slots = 3
 
 /datum/advclass/ork/marauder
-	name = "Marauder ork"
+	name = "Marauder Ork"
 	tutorial = ""
 	allowed_sexes = list(MALE)
 	outfit = /datum/outfit/job/roguetown/npc/orc/marauder
@@ -40,7 +40,7 @@
 	maximum_possible_slots = 2
 
 /datum/advclass/ork/warlord
-	name = "Warlord ork"
+	name = "Warlord Ork"
 	tutorial = ""
 	allowed_sexes = list(MALE)
 	outfit = /datum/outfit/job/roguetown/npc/orc/warlord
