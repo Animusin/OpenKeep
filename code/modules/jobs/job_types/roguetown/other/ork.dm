@@ -83,10 +83,10 @@
 		H.advsetup = 1
 		H.invisibility = INVISIBILITY_MAXIMUM
 		H.become_blind("advsetup")
-		if(M.mind)
-			M.mind.special_role = "Ork"
-			M.mind.assigned_role = "Ork"
-			M.mind.current.job = "Ork"
+		if(H.mind)
+			H.mind.special_role = "Ork"
+			H.mind.assigned_role = "Ork"
+			H.mind.current.job = "Ork"
 		if(H.dna && H.dna.species)
 			H.set_species(/datum/species/orc)
             H.after_creation()
