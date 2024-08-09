@@ -7,6 +7,10 @@
 	antag_hud_name = "ork"
 	confess_lines = list("RAVAGE!!!", "I WILL NOT LIVE IN YOUR WALLS!", "I WILL NOT FOLLOW YOUR RULES!")
 
+/datum/antagonist/ork/on_gain()
+    . = ..()
+    addtimer(CALLBACK(H, TYPE_PROC_REF(/mob/living/carbon/human, choose_name_popup), "ORK"), 5 SECONDS)
+
 /datum/advclass/ork/ambush
 	name = "Ambush Ork"
 	tutorial = ""
