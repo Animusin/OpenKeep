@@ -22,7 +22,7 @@
 		var/mob/living/target = targets[1]
 		if(target.anti_magic_check(TRUE, TRUE))
 			return FALSE
-		target.visible_message("<span class='warning'>[user] points at [target]'s eyes!</span>","<span class='warning'>My eyes are covered in darkness!</span>")		
+		target.visible_message("<span class='warning'>[user] points at [target]'s eyes!</span>","<span class='warning'>My eyes are covered in darkness!</span>")
 		target.blind_eyes(2)
 	return TRUE
 
@@ -43,7 +43,7 @@
 	miracle = TRUE
 	devotion_cost = -45
 
-/obj/effect/proc_holder/spell/invoked/invisibility/cast(list/targets, mob/living/user)	
+/obj/effect/proc_holder/spell/invoked/invisibility/cast(list/targets, mob/living/user)
 	if(isliving(targets[1]))
 		var/mob/living/target = targets[1]
 		if(target.anti_magic_check(TRUE, TRUE))

@@ -204,10 +204,8 @@
 			if(user.mind && mind)
 				if(user.mind.has_antag_datum(/datum/antagonist/werewolf))
 					if(!src.mind.has_antag_datum(/datum/antagonist/werewolf))
-						if(prob(35))
-							spawn(3 MINUTES)
-								H.werewolf_infect()
-							//addtimer(CALLBACK(src, TYPE_PROC_REF(/mob/living/carbon/human, werewolf_infect)), 3 MINUTES)
+						if(prob(10))
+							addtimer(CALLBACK(src, TYPE_PROC_REF(/mob/living/carbon/human, werewolf_infect)), 3 MINUTES)
 				if(user.mind.has_antag_datum(/datum/antagonist/zombie) && !src.mind.has_antag_datum(/datum/antagonist/zombie))
 					INVOKE_ASYNC(H, TYPE_PROC_REF(/mob/living/carbon/human, zombie_infect_attempt))
 
@@ -406,7 +404,7 @@
 										stealpos.Add(V.get_item_by_slot(SLOT_BELT_R))
 									if (V.get_item_by_slot(SLOT_BELT_L))
 										stealpos.Add(V.get_item_by_slot(SLOT_BELT_L))
-								if("r_hand" || "l_hand")
+								if("r_hand", "l_hand")
 									if (V.get_item_by_slot(SLOT_RING))
 										stealpos.Add(V.get_item_by_slot(SLOT_RING))
 							if (length(stealpos) > 0)
@@ -445,12 +443,12 @@
 								if(foundstab)
 									if(L.mind.get_skill_level(/datum/skill/misc/lockpicking) >= initial(door.kickthresh) / 5)
 										door.kickthresh--
-									if((prob(L.mind.get_skill_level(/datum/skill/misc/lockpicking) * 5) || door.kickthresh == 0) && (L.mind.get_skill_level(/datum/skill/misc/lockpicking) >= initial(door.kickthresh) / 5))								
+									if((prob(L.mind.get_skill_level(/datum/skill/misc/lockpicking) * 5) || door.kickthresh == 0) && (L.mind.get_skill_level(/datum/skill/misc/lockpicking) >= initial(door.kickthresh) / 5))
 										src.visible_message("<span class='warning'>[src] lockpicks [door.name] successfully!</span>", \
 											"<span class='notice'>I lockpick [door.name]!</span>")
 										door.locked = 0
 										door.force_open()
-									else								
+									else
 										src.visible_message("<span class='warning'>[src] messes around [door.name] suspiciously!</span>", \
 											"<span class='notice'>I fail to lockpick [door.name]!</span>")
 										src.mind.adjust_experience(/datum/skill/misc/lockpicking, src.STAINT*src.mind.get_learning_boon(/datum/skill/misc/lockpicking), FALSE)
@@ -462,7 +460,7 @@
 							else
 								to_chat(src, "<span class='warning'>I can't do that with naked hands. I need sharp tool in the other hand!</span>")
 						//try to kick open, destroy lock
-					else						
+					else
 						src.visible_message("<span class='warning'>[src] opens [door.name]!</span>", \
 							"<span class='notice'>I open [door.name]! It wasn't closed.</span>")
 						door.force_open()
