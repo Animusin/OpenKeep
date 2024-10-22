@@ -162,7 +162,7 @@
 				stat("Confessions sent: [GLOB.confessors.len]")
 
 	return //RTchange
-
+/* 
 	if(statpanel("Status"))
 //		stat(null, "Intent: [used_intent]")
 //		stat(null, "Move Mode: [m_intent]")
@@ -208,7 +208,7 @@
 					for(var/thing in diseases)
 						var/datum/disease/D = thing
 						stat("*", "[D.name], Type: [D.spread_text], Stage: [D.stage]/[D.max_stages], Possible Cure: [D.cure_text]")
-
+ */
 
 /mob/living/carbon/human/show_inv(mob/user)
 	user.set_machine(src)
