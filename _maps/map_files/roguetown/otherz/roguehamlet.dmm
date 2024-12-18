@@ -16776,7 +16776,7 @@
 /area/rogue/indoors)
 "nYu" = (
 /obj/structure/toilet/secret{
-	secret_type = /obj/item/rogueweapon/huntingknife/idagger
+	secret_type = /obj/item/rogueweapon/knife/dagger/steel
 	},
 /obj/structure/bars/grille,
 /turf/open/transparent/openspace,
