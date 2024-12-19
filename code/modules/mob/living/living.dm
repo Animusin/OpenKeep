@@ -64,7 +64,7 @@
 				playsound(src.loc, 'sound/foley/bodyfall (1).ogg', 100, FALSE)
 			return
 	var/points
-	for(var/i in (2 to levels))
+	for(var/i in 2 to levels)
 		i++
 		points += "!"
 	if(!sneak_fall)
