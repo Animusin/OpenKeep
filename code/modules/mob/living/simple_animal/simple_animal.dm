@@ -239,7 +239,9 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 	stop_automated_movement_when_pulled = TRUE
 	if(user)
 		owner = user
-		friends |= user.name
+		if(ishostile(src))
+			var/mob/living/simple_animal/hostile/H = src
+			H.friends += user.name
 	return
 
 //mob/living/simple_animal/examine(mob/user)
