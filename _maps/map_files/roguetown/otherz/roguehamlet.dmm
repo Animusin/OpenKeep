@@ -17262,7 +17262,7 @@
 "nYu" = (
 /obj/structure/bars/grille,
 /obj/structure/toilet/secret{
-	secret_type = /obj/item/rogueweapon/huntingknife/idagger
+	secret_type = /obj/item/rogueweapon/knife/dagger/steel
 	},
 /turf/open/transparent/openspace,
 /area/rogue/indoors/town/cell)
