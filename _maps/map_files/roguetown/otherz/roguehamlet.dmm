@@ -4200,9 +4200,7 @@
 	ambush_mobs = list(/mob/living/simple_animal/hostile/retaliate/rogue/spider/mutated = 100)
 	})
 "dBf" = (
-/obj/structure/bars/cemetery{
-	lockid = "tavern"
-	},
+/obj/structure/bars/cemetery,
 /turf/open/floor/rogue/dirt/road,
 /area/rogue/outdoors/town)
 "dBl" = (
