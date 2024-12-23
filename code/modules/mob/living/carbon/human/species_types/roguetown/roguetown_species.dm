@@ -34,7 +34,7 @@
 				var/mob/living/carbon/human/H
 				if(ismob(source))
 					H = source
-					if(H?.assigned_role in GLOB.noble_positions)
+					if(H.mind?.assigned_role in GLOB.noble_positions)
 						accent_words = strings("accent_universal.json", "royal")
 					else
 						accent_words = strings("accent_universal.json", "universal")

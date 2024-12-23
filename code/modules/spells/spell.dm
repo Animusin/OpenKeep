@@ -454,12 +454,10 @@ GLOBAL_LIST_INIT(spells, typesof(/obj/effect/proc_holder/spell)) //needed for th
 				smoke.set_up(smoke_amt, location)
 				smoke.start()
 	if(miracle)
-		var/mob/living/carbon/human/C = user
-		var/datum/devotion/cleric_holder/D = C.cleric
-		if(ishuman(user))
-			var/mob/living/carbon/human/H = user
-			var/boon = H?.mind?.get_learning_boon(/datum/skill/magic/holy)
-			H.mind?.adjust_experience(/datum/skill/magic/holy, (devotion_cost*boon/2))
+		var/mob/living/carbon/human/C = usr
+		if(ishuman(C))
+			var/boon = C?.mind?.get_learning_boon(/datum/skill/magic/holy)
+			C.mind?.adjust_experience(/datum/skill/magic/holy, (devotion_cost*boon/2))
 	return
 
 
