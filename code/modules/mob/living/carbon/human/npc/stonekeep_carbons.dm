@@ -183,7 +183,7 @@
 	..()
 	remove_all_languages()
 	grant_language(/datum/language/orcish)
-	to_chat(C, "<span class='info'>I can speak Orcish with ,g before my speech.</span>")
+	to_chat(src, "<span class='info'>I can speak Orcish with ,g before my speech.</span>")
 
 
 // -------------------		SAVAGE ORC		--------------------------
