@@ -60,6 +60,9 @@
 			resisting = FALSE
 		else
 			stand_attempts = 0
+			if(gpt_enabled)
+				process_ai_gpt()
+				return TRUE
 			if(!handle_combat())
 				if(mode == AI_IDLE && !pickupTarget)
 					npc_idle()
