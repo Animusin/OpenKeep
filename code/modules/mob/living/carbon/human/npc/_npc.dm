@@ -61,8 +61,10 @@
 		else
 			stand_attempts = 0
 			if(gpt_enabled)
+				aggressive = 0
 				process_ai_gpt()
-				return TRUE
+			else
+				aggressive = initial(aggressive)
 			if(!handle_combat())
 				if(mode == AI_IDLE && !pickupTarget)
 					npc_idle()
@@ -236,7 +238,7 @@
 	if(L.name in friends)
 		return FALSE
 
-	if(enemies[L])
+	if(L in enemies)
 		return TRUE
 
 	if(aggressive && !faction_check_mob(L))

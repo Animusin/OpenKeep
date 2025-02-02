@@ -1,3 +1,6 @@
+#define GPT_ACTION_TIMEOUT 100
+#define GPT_ROLE_TIMEOUT 600
+
 ///////////////////////////////////////////////////////////////
 // Utility: Join a list of strings with a given delimiter
 ///////////////////////////////////////////////////////////////
@@ -21,7 +24,7 @@ proc/strip_chars(var/string, var/remove="() ")
 	for(var/i = 1 to len)
 		var/c = copytext(string,i,i+1)
 		// If c is NOT in remove-list, keep it
-		if(!findtext(remove,c))
+		if(!findtext_char(remove,c))
 			newstr += c
 	return newstr
 
@@ -30,10 +33,10 @@ proc/strip_chars(var/string, var/remove="() ")
 	//  A) Vars for GPT
 	////////////////////////////////////////////////////////////
 	var
-		gpt_enabled = FALSE  // set TRUE if you want GPT AI
+		gpt_enabled = TRUE  // set TRUE if you want GPT AI
 		// Times (in ticks) for GPT calls
-		gpt_action_interval = 50	// ~5 seconds
-		gpt_role_interval   = 300   // ~30 seconds
+		gpt_action_interval = GPT_ACTION_TIMEOUT	// ~5 seconds
+		gpt_role_interval   = GPT_ROLE_TIMEOUT   // ~30 seconds
 		next_gpt_action_call = 0
 		next_gpt_role_call = 0
 
@@ -42,6 +45,7 @@ proc/strip_chars(var/string, var/remove="() ")
 
 		// We'll store recent lines of chat
 		list/gpt_say_logs = list()
+		list/say_logs_around = list()
 
 		// occupant map for environment
 		list/gpt_occupant_map = list()
@@ -93,21 +97,41 @@ proc/strip_chars(var/string, var/remove="() ")
 	//  C) Build the Action Prompt
 	////////////////////////////////////////////////////////////
 	proc/build_action_prompt()
-		var/env_snapshot = gather_gpt_environment_snapshot(3)
-		var/saylog_text = text_join(gpt_say_logs, "\n")
+		var/env_snapshot = gather_gpt_environment_snapshot(4)
+		var/commandlog_text = text_join(gpt_say_logs, "\n")
+		var/saylog_text = text_join(say_logs_around, "\n")
 
 		// Combine our existing 'personality' + environment + instructions
 		var/prompt = ""
-		prompt += "[gpt_personality]\n\n"
-		prompt += "ENVIRONMENT (7x7 around me, medieval grimdark):\n"
+		prompt += "YOUR PERSONALITY:[gpt_personality]\n\n"
+		prompt += "\nRECENT SPEECH: \n[saylog_text]\n\n"
+		prompt += "ENVIRONMENT (9x9 around me):\n"
 		prompt += "[env_snapshot]\n"
-		prompt += "RECENT SPEECH:\n[saylog_text]\n\n"
+		// Use stringified keys (e.g., "1" for LOG_ATTACK)
+		var/attack_key = num2text(LOG_ATTACK)
+
+		prompt += "RECENT ATTACKS:\n"
+		if (islist(logging[attack_key]))
+			var/list/attacks = logging[attack_key]
+			world.log << "[logging[attack_key].len]: length of logging attack_key"
+			if(attacks.len > 20)
+				attacks.Cut(1, attacks.len - 19)
+			for (var/entry in attacks[attack_key])
+				world.log << "[entry]: entry"
+				world.log << "[attacks[attack_key][entry]]: entry1"
+				prompt += "[entry]: [attacks[attack_key][entry]]\n"
+		else
+			prompt += "None.\n"
+
+		prompt += "\nENEMIES: \n[text_join(enemies, "\n")]\n\n"
+		prompt += "YOUR RECENT ACTIONS:\n[commandlog_text]\n\n"
 		prompt += "You can ONLY RESPOND in JSON:\n"
 		prompt += "{\"command\":\"COMMAND\",\"args\":\"ARG\"}\n"
-		prompt += "Valid commands: walk, say, retaliate, deaggro.\n"
-		prompt += " - walk => '(dx,dy)'\n"
+		prompt += "Valid commands: goto, say, retaliate, follow, deaggro.\n"
+		prompt += " - goto => '(dx,dy)'\n"
 		prompt += " - say => 'some text'\n"
 		prompt += " - retaliate => '#ID'\n"
+		prompt += " - follow => '#ID'\n"
 		prompt += " - deaggro => no fights\n\n"
 		prompt += "What do you do?\n"
 
@@ -123,16 +147,38 @@ proc/strip_chars(var/string, var/remove="() ")
 		*/
 		var/role_info = ""
 		// These might be placeholders – adapt to your codebase
+		role_info += "Personality: [gpt_personality]\n"
 		role_info += "Assigned Role: [mind?.assigned_role]\n"
 		role_info += "Real Name: [real_name]\n"
 		role_info += "Species: [dna.species]\n"
 		role_info += "Health: [health]\n"
 		// `contents` might be your inventory; adapt
 		role_info += "Inventory: [contents]\n"
+		role_info += "Look: [text_join(src.examine(src), "\n")]\n"
+
+		var/commandlog_text = text_join(gpt_say_logs, "\n")
+		role_info += "YOUR RECENT ACTIONS:\n[commandlog_text]\n\n"
+		var/saylog_text = text_join(say_logs_around, "\n")
+
+		var/attack_key = num2text(LOG_ATTACK)
+
+		role_info += "RECENT ATTACKS:\n"
+		if (islist(logging[attack_key]))
+			var/list/attacks = logging[attack_key]
+			world.log << "[logging[attack_key].len]: length of logging attack_key"
+			if(attacks.len > 20)
+				attacks.Cut(1, attacks.len - 19)
+			for (var/entry in attacks[attack_key])
+				world.log << "[entry]: entry"
+				world.log << "[attacks[attack_key][entry]]: entry1"
+				role_info += "[entry]: [attacks[attack_key][entry]]\n"
+		else
+			role_info += "None.\n"
+
+		role_info += "\nRECENT SPEECH: \n[saylog_text]\n\n"
 
 		var/prompt = ""
-		prompt += "You are an NPC in a medieval grimdark environment.\n"
-		prompt += "Create a short persona description from this info:\n"
+		prompt += "Create a short description of an NPC in a medieval grimdark environment. Base on the Personality if there is any. Add short summary of their last interactions.\n"
 		prompt += "[role_info]\n\n"
 		prompt += "Return ONLY the text. No extra JSON.\n"
 
@@ -163,13 +209,15 @@ proc/strip_chars(var/string, var/remove="() ")
 			return
 
 		var/raw_response = file2text(content_file)
+		var/raw_response_fixed = replacetext_char(raw_response, "\\\"", "\"")
+		raw_response = raw_response_fixed
 		// optional trim() if you have it, or define your own
 		// raw_response = trim(raw_response) // if your older DM has no trim, skip it
 
 		world.log << "[src]: Received GPT action response: [raw_response]"
 
 		// find first '{'
-		var/json_start = findtext(raw_response, "{", 1)
+		var/json_start = findtext_char(raw_response, "{", 1)
 		if(!json_start)
 			world.log << "[src]: No '{' found in GPT response!"
 			return
@@ -181,13 +229,13 @@ proc/strip_chars(var/string, var/remove="() ")
 			return
 
 		// slice from json_start..json_end
-		var/json_text = copytext(raw_response, json_start, json_end+1)
+		var/json_text = copytext_char(raw_response, json_start, json_end+1)
 
 		// naive parse of "command" and "args"
 		var/command = ""
 		var/argument = ""
 
-		var/cpos = findtext(json_text, "\"command\":", 1)
+		var/cpos = findtext_char(json_text, "\"command\":", 1)
 		if(cpos)
 			var/startc = findtext(json_text, "\"", cpos+10)
 			var/endc   = findtext(json_text, "\"", startc+1)
@@ -197,9 +245,9 @@ proc/strip_chars(var/string, var/remove="() ")
 		var/apos = findtext(json_text, "\"args\":", 1)
 		if(apos)
 			var/starta = findtext(json_text, "\"", apos+6)
-			var/enda   = findtext(json_text, "\"", starta+1)
+			var/enda   = findtext_char(json_text, "\"", starta+1)
 			if(starta && enda)
-				argument = copytext(json_text, starta+1, enda)
+				argument = copytext_char(json_text, starta+1, enda)
 
 		if(!command)
 			command = "say"
@@ -268,7 +316,11 @@ proc/strip_chars(var/string, var/remove="() ")
 	////////////////////////////////////////////////////////////
 	proc/handle_gpt_command(var/cmd, var/cmd_args)
 		world.log << "in the command queue: [cmd] [cmd_args]"
-		if(cmd == "walk")
+		gpt_say_logs += "[src]: Command:[cmd] Args:[cmd_args]"
+		if(gpt_say_logs.len > 20)
+			gpt_say_logs.Cut(1,2)
+
+		if(cmd == "goto")
 			var/list/coords = parse_relative_coords(cmd_args)
 			if(coords.len == 2)
 				step_gpt(coords[1], coords[2])
@@ -284,11 +336,25 @@ proc/strip_chars(var/string, var/remove="() ")
 			else
 				visible_message("[src] growls at the air, no target found.")
 
+		else if(cmd == "follow")
+			// e.g. "#2"
+			var/mob/living/target_mob = gpt_occupant_map[cmd_args]
+			if(target_mob)
+				walk2derpless(target_mob)
+				addtimer(CALLBACK(src, TYPE_PROC_REF(/mob/living/carbon/human, return_action)), 10 SECONDS)
+			else
+				visible_message("[src] growls at the air, no target found.")
+
 		else if(cmd == "deaggro")
 			back_to_idle()
+			target = null
+			enemies = list()
 
 		else
 			visible_message("[src] looks confused (unknown command).")
+
+	proc/return_action()
+		walk(src,0)
 
 	////////////////////////////////////////////////////////////
 	//  H) step_gpt to move the mob
@@ -296,49 +362,65 @@ proc/strip_chars(var/string, var/remove="() ")
 	proc/step_gpt(var/dx, var/dy)
 		var/turf/dest = locate(x + dx, y + dy, z)
 		if(dest)
-			Move(dest)
+			walk2derpless(dest)
 		else
 			emote("bumps into unseen rubble.")
 
 	////////////////////////////////////////////////////////////
 	//  I) Gather environment in a 7x7
 	////////////////////////////////////////////////////////////
-	proc/gather_gpt_environment_snapshot(var/radius = 3)
+	proc/gather_gpt_environment_snapshot(var/radius = 4)
 		gpt_occupant_map = list()
 		var/id_counter = 1
 		var/result = ""
+		var/result_short = ""
+		var/list/occupants = list()
 
-		for(var/x_offset in -radius to radius)
-			for(var/y_offset in -radius to radius)
+		for(var/y_offset in -radius to radius)
+			result += "\n"
+			result_short += "\n"
+			for(var/x_offset in -radius to radius)
 				var/dx = x_offset
 				var/dy = y_offset
 				var/turf/T = locate(x + dx, y + dy, z)
 
 				if(!T)
-					result += "([dx],[dy]): ??\n"
+					result += "|| ([dx],[dy]): ??"
+					result_short += "|| ??"
 					continue
+				else
+					result += "|| ([dx],[dy]) "
+					result_short += "|| [T]"
 
-				if(T.density)
-					result += "([dx],[dy]): wall\n"
-					continue
+				// Check atoms
+				var/objects = ""
+				for(var/obj/A in T)
+					objects += " [A]"
+				if(objects != "")
+					result += " Objects:"
+					result += objects
+					result += "."
 
 				// Check occupant
 				var/mob/living/occupant = null
 				for(var/mob/living/L in T)
 					occupant = L
-					break
-
-				if(occupant && occupant != src)
-					var/id_str = "#[id_counter]"
-					gpt_occupant_map[id_str] = occupant
-					result += "([dx],[dy]): occupant [id_str] = \"[occupant.name]\"\n"
-					id_counter++
-				else if(occupant == src)
-					result += "([dx],[dy]): me\n"
-				else
-					result += "([dx],[dy]): free\n"
-
-		return result
+					if(occupant && occupant != src)
+						var/id_str = "#[id_counter]"
+						gpt_occupant_map[id_str] = occupant
+						result += " Occupant [id_str] = \"[occupant.name]\" /"
+						result_short += " Occupant [id_str] = \"[occupant.name]\" /"
+						occupants |= occupant
+						id_counter++
+					else if(occupant == src)
+						result += "/ I am here "
+						result_short += "/ I am here "
+		result += "\n"
+		for(var/mob/living/occupant in occupants)
+			result += " Occupant [occupant.name] looks [text_join(occupant.examine(src), "\n")] \n"
+		result_short += "\n"
+		result_short += result
+		return result_short
 
 	////////////////////////////////////////////////////////////
 	//  J) parse_relative_coords
@@ -356,11 +438,17 @@ proc/strip_chars(var/string, var/remove="() ")
 	////////////////////////////////////////////////////////////
 	//  K) Overriding Hear() to store last 10 lines
 	////////////////////////////////////////////////////////////
-	Hear(var/mob/living/carbon/human/speaker, var/message)
-		if(speaker && message && get_dist(speaker, src) <= 7)
-			gpt_say_logs += "[speaker.name]: [message]"
-			if(gpt_say_logs.len > 10)
-				gpt_say_logs.Cut(1,1)
+
+	Hear(message, atom/movable/speaker, datum/language/message_language, raw_message, radio_freq, list/spans, message_mode)
+		say_logs_around += "[speaker.name]: [raw_message]"
+		if(say_logs_around.len > 40)
+			say_logs_around.Cut(1,2)
 		..()
 
+	show_message(msg, type, alt_msg, alt_type)//Message, type of message (1 or 2), alternative message, alt message type (1 or 2)
+		if(!client)
+			say_logs_around += "AROUND: [msg]"
+			if(say_logs_around.len > 40)
+				say_logs_around.Cut(1,2)
+		..()
 
