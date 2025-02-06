@@ -3637,6 +3637,10 @@
 /obj/machinery/light/rogue/wallfire/candle,
 /turf/open/floor/rogue/ruinedwood/spiral,
 /area/rogue/indoors/town/church/chapel)
+"cLD" = (
+/mob/living/carbon/human/species/human/northern/npc/watchman,
+/turf/open/floor/rogue/dirt/road,
+/area/rogue/outdoors/town)
 "cLS" = (
 /obj/structure/chair/bench/couch,
 /obj/machinery/light/rogue/wallfire/candle,
@@ -9799,6 +9803,17 @@
 /obj/structure/fluff/statue/knight/interior,
 /turf/open/floor/rogue/cobble,
 /area/rogue/under/town/basement)
+"hfF" = (
+/obj/effect/decal/shadow_floor{
+	dir = 8
+	},
+/mob/living/carbon/human/species/human/northern/npc/servant,
+/turf/open/floor/rogue/tile/masonic{
+	dir = 8
+	},
+/area/rogue/indoors/town/manor{
+	first_time_text = "Blackwine Manor"
+	})
 "hgQ" = (
 /obj/effect/decal/cleanable/blood,
 /obj/effect/decal/remains/human/old,
@@ -20744,6 +20759,13 @@
 /area/rogue/under/cave/spider{
 	ambush_mobs = list(/mob/living/simple_animal/hostile/retaliate/rogue/spider/mutated = 100)
 	})
+"oZj" = (
+/obj/effect/decal/turfedge_neu/mossy{
+	dir = 8
+	},
+/mob/living/carbon/human/species/human/northern/npc/watchman,
+/turf/open/floor/rogue/cobblerock_alt,
+/area/rogue/outdoors/exposed/manorgarri)
 "oZK" = (
 /obj/effect/spawner/roguemap/beartrap,
 /turf/open/floor/rogue/cobblerock,
@@ -20801,6 +20823,13 @@
 	},
 /turf/open/floor/rogue/concrete,
 /area/rogue/indoors/town/cell)
+"pcd" = (
+/obj/effect/decal/turfedge_neu{
+	dir = 6
+	},
+/mob/living/carbon/human/species/human/northern/npc/wench,
+/turf/open/floor/rogue/cobble/mossy/alt,
+/area/rogue/indoors/town/tavern)
 "pch" = (
 /obj/effect/decal/remains/human/old,
 /obj/item/rogueweapon/pick,
@@ -25213,6 +25242,14 @@
 "sml" = (
 /turf/closed/wall/mineral/rogue/roofwall/outercorner,
 /area/rogue/outdoors/town/roofs)
+"smw" = (
+/obj/structure/chair/bench/church/mid{
+	icon_state = "church_benchmid";
+	dir = 1
+	},
+/mob/living/carbon/human/species/human/northern/npc/acolyte,
+/turf/open/floor/rogue/ruinedwood,
+/area/rogue/indoors/town/church/chapel)
 "smY" = (
 /turf/open/floor/rogue/dirt,
 /area/rogue/outdoors/town)
@@ -31156,6 +31193,7 @@
 /area/rogue/outdoors/rtfield/outlaw)
 "wyz" = (
 /obj/structure/fluff/walldeco/chains,
+/mob/living/carbon/human/species/human/northern/npc/prisoner,
 /turf/open/floor/rogue/dirt/road,
 /area/rogue/indoors/town/cell)
 "wyG" = (
@@ -31893,6 +31931,12 @@
 /obj/structure/roguewindow/solid,
 /turf/open/floor/rogue/ruinedwood/spiral,
 /area/rogue/indoors)
+"xad" = (
+/mob/living/carbon/human/species/human/northern/npc/jester,
+/turf/open/floor/rogue/carpet/lord/right,
+/area/rogue/indoors/town/manor{
+	first_time_text = "Blackwine Manor"
+	})
 "xaf" = (
 /obj/effect/decal/cleanable/blood/splatter,
 /turf/open/floor/rogue/cobblerock,
@@ -33085,6 +33129,13 @@
 /obj/effect/spawner/roguemap/sewerencounter,
 /turf/open/floor/rogue/blocks/paving,
 /area/rogue/under/town/sewer)
+"xNS" = (
+/obj/effect/decal/turfedge_neu{
+	dir = 6
+	},
+/mob/living/carbon/human/species/human/northern/npc/servant,
+/turf/open/floor/rogue/cobble/mossy/alt,
+/area/rogue/indoors/town/tavern)
 "xOi" = (
 /obj/structure/table/wood/reinforced_alt{
 	dir = 4
@@ -70779,7 +70830,7 @@ vYE
 bGv
 lil
 xqi
-vYE
+hfF
 lil
 aTI
 eKW
@@ -70821,7 +70872,7 @@ pcr
 wcu
 aKb
 aKb
-pKw
+cLD
 irJ
 dew
 dew
@@ -71358,7 +71409,7 @@ kfw
 fbb
 ouS
 fFo
-kbl
+xad
 kbl
 kbl
 kbl
@@ -71371,7 +71422,7 @@ pAF
 vac
 bLE
 vac
-kFP
+oZj
 ieC
 vac
 vac
@@ -72193,7 +72244,7 @@ gvD
 nIa
 yiq
 tKP
-gvD
+pcd
 uNF
 dBI
 uNF
@@ -72386,7 +72437,7 @@ sCN
 rVL
 aPm
 aPm
-gvD
+xNS
 dUL
 sCN
 vAi
@@ -72943,7 +72994,7 @@ gtN
 wQa
 lMq
 wQa
-pDv
+smw
 pDv
 pDv
 pDv
