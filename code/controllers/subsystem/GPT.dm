@@ -116,6 +116,7 @@ proc/strip_chars(var/string, var/remove = "() ")
 
 		// Combine our existing 'personality' + environment + instructions
 		var/prompt = ""
+		prompt += "YOU ARE: [src.real_name]\n"
 		prompt += "YOUR PERSONALITY:[gpt_personality]\n\n"
 		prompt += "\nRECENT SPEECH: \n[saylog_text]\n\n"
 		prompt += "ENVIRONMENT (11x11 around me):\n"
@@ -161,6 +162,7 @@ proc/strip_chars(var/string, var/remove = "() ")
 		var/env_snapshot = gather_gpt_environment_snapshot(3)   // _NEW_
 		var/saylog_text = text_join(say_logs_around, "\n")   // _NEW_
 		var/prompt = ""   // _NEW_
+		prompt += "YOU ARE: [src.real_name]\n"
 		prompt += "YOUR PERSONALITY: [gpt_personality]\n\n"   // _NEW_
 		prompt += "RECENT SPEECH: \n[saylog_text]\n\n"   // _NEW_
 		prompt += "ENVIRONMENT (11x11 around me):\n[env_snapshot]\n\n"   // _NEW_
@@ -175,6 +177,7 @@ proc/strip_chars(var/string, var/remove = "() ")
 		var/env_snapshot = gather_gpt_environment_snapshot(5)   // _NEW_
 		var/saylog_text = text_join(say_logs_around, "\n")   // _NEW_
 		var/prompt = ""   // _NEW_
+		prompt += "YOU ARE: [src.real_name]\n"
 		prompt += "YOUR PERSONALITY: [gpt_personality]\n\n"   // _NEW_
 		prompt += "RECENT SPEECH: \n[saylog_text]\n\n"   // _NEW_
 		prompt += "ENVIRONMENT (11x11 around me):\n[env_snapshot]\n\n"   // _NEW_
@@ -191,6 +194,7 @@ proc/strip_chars(var/string, var/remove = "() ")
 		  species, contents, health, define them or adapt as needed.
 		*/
 		var/role_info = ""
+		role_info += "YOU ARE: [src.real_name]\n"
 		role_info += "Personality: [gpt_personality]\n"
 		role_info += "Assigned Role: [mind?.assigned_role]\n"
 		role_info += "Real Name: [real_name]\n"
@@ -221,7 +225,7 @@ proc/strip_chars(var/string, var/remove = "() ")
 		role_info += "\nRECENT SPEECH: \n[saylog_text]\n\n"
 
 		var/prompt = ""
-		prompt += "Create a short description of an NPC in a medieval grimdark environment. Base on the Personality if there is any. Add short summary of their last interactions.\n"
+		prompt += "Create a short description of an NPC in a medieval fantasy environment. Base on the Personality if there is any. Add short summary of their last interactions.\n"
 		prompt += "[role_info]\n\n"
 		prompt += "Return ONLY the text. No extra JSON.\n"
 
@@ -364,47 +368,48 @@ proc/strip_chars(var/string, var/remove = "() ")
 	////////////////////////////////////////////////////////////
 	proc/handle_gpt_command(var/cmd, var/cmd_args)
 		world.log << "in the command queue: [cmd] [cmd_args]"
-		gpt_say_logs += "[src]: Command:[cmd] Args:[cmd_args]"
+		var/result = ""
 		if(gpt_say_logs.len > 20)
 			gpt_say_logs.Cut(1,2)
 		if(cmd == "goto")
 			var/list/coords = parse_relative_coords(cmd_args)
 			if(coords.len == 2)
-				step_gpt(coords[1], coords[2])
+				result = step_gpt(coords[1], coords[2])
 		else if(cmd == "pickup")
 			var/comma_pos = findtext_char(cmd_args, " ", 1)
 			var/object_name = copytext_char(cmd_args, comma_pos+1)
 			var/coords_string = copytext(cmd_args, 1, comma_pos-1)
 			var/list/coords = parse_relative_coords(coords_string)
 			if(coords.len == 2)
-				pickup_gpt(coords[1], coords[2], object_name)
+				result = pickup_gpt(coords[1], coords[2], object_name)
 		else if(cmd == "interact")
 			var/comma_pos = findtext_char(cmd_args, " ", 1)
 			var/object_name = copytext_char(cmd_args, comma_pos+1)
 			var/coords_string = copytext(cmd_args, 1, comma_pos-1)
 			var/list/coords = parse_relative_coords(coords_string)
 			if(coords.len == 2)
-				interact_gpt(coords[1], coords[2], object_name)
+				result = interact_gpt(coords[1], coords[2], object_name)
 		else if(cmd == "draw")
 			for(var/obj/item/I in contents)
 				if(I.name == cmd_args)
-					put_in_active_hand(I)
+					result = put_in_active_hand(I)
 		else if(cmd == "lock")
 			var/list/coords = parse_relative_coords(cmd_args)
 			if(coords.len == 2)
-				lock_gpt(coords[1], coords[2])
+				result = lock_gpt(coords[1], coords[2])
 		else if(cmd == "say")
-			say("[cmd_args]")
+			result = say("[cmd_args]")
 		else if(cmd == "retaliate")
 			var/mob/living/target_mob = gpt_occupant_map[cmd_args]
 			if(target_mob)
-				retaliate(target_mob)
+				result = retaliate(target_mob)
 			else
 				visible_message("[src] growls at the air, no target found.")
 		else if(cmd == "follow")
 			var/mob/living/target_mob = gpt_occupant_map[cmd_args]
 			if(target_mob)
 				walk_to(src,target_mob,0,update_movespeed())
+				result = 1
 				addtimer(CALLBACK(src, TYPE_PROC_REF(/mob/living/carbon/human, return_action)), 10 SECONDS)
 			else
 				visible_message("[src] growls at the air, no target found.")
@@ -416,6 +421,7 @@ proc/strip_chars(var/string, var/remove = "() ")
 			src.dropItemToGround(src.get_active_held_item())
 		else
 			visible_message("[src] looks confused (unknown command).")
+		gpt_say_logs += "[src]: Command:[cmd] Args:[cmd_args] Result:[result]"
 
 	proc/return_action()
 		walk(src, 0)
@@ -426,33 +432,44 @@ proc/strip_chars(var/string, var/remove = "() ")
 	proc/step_gpt(var/dx, var/dy)
 		var/turf/dest = locate(x + dx, y + dy, z)
 		if(dest)
-			walk2derpless(dest)
+			return walk2derpless(dest)
 		else
 			emote("bumps into unseen rubble.")
+			return 0
 
 	proc/pickup_gpt(var/dx, var/dy, var/object_name)
 		var/turf/dest = locate(x + dx, y + dy, z)
 		if(dest)
-			walk2derpless(dest)
-			for(var/obj/item/I in dest)
-				if(I.name == object_name)
-					addtimer(CALLBACK(src, TYPE_PROC_REF(/mob/living/carbon/human, pickup_action), I), 3 SECONDS)
-				else
-					emote("can't pick up [I.name].")
+			if(walk2derpless(dest))
+				for(var/obj/item/I in dest)
+					if(I.name == object_name)
+						addtimer(CALLBACK(src, TYPE_PROC_REF(/mob/living/carbon/human, pickup_action), I), 3 SECONDS)
+						return 1
+					else
+						emote("can't pick up [I.name].")
+						return 0
+			else
+				return "unreachable"
 		else
 			emote("bumps into unseen rubble.")
+			return 0
 
 	proc/interact_gpt(var/dx, var/dy, var/object_name)
 		var/turf/dest = locate(x + dx, y + dy, z)
 		if(dest)
-			walk2derpless(dest)
-			for(var/obj/structure/I in dest)
-				if(I.name == object_name)
-					addtimer(CALLBACK(src, TYPE_PROC_REF(/mob/living/carbon/human, interact_action), I), 3 SECONDS)
-				else
-					emote("can't interact with [I.name].")
+			if(walk2derpless(dest))
+				for(var/obj/structure/I in dest)
+					if(I.name == object_name)
+						addtimer(CALLBACK(src, TYPE_PROC_REF(/mob/living/carbon/human, interact_action), I), 3 SECONDS)
+						return 1
+					else
+						emote("can't interact with [I.name].")
+						return 0
+			else
+				return "unreachable"
 		else
 			emote("bumps into unseen rubble.")
+			return 0
 
 	proc/lock_gpt(var/dx, var/dy)
 		var/turf/dest = locate(x + dx, y + dy, z)
@@ -465,19 +482,24 @@ proc/strip_chars(var/string, var/remove = "() ")
 			for(var/obj/item/roguekey/K in contents)
 				lock_ids += K.lockid
 			if(MD && (MD.lockid in lock_ids))
-				addtimer(CALLBACK(src, TYPE_PROC_REF(/mob/living/carbon/human, open_action), MD), 3 SECONDS)
-			if(PL && ("garrison" in lock_ids || "dungeoneer" in lock_ids))
-				addtimer(CALLBACK(src, TYPE_PROC_REF(/mob/living/carbon/human, open_action), PL), 3 SECONDS)
+				addtimer(CALLBACK(src, TYPE_PROC_REF(/mob/living/carbon/human, open_action), MD), 2 SECONDS)
+				return 1
+			if(PL && (("garrison" in lock_ids) || ("dungeoneer" in lock_ids)))
+				addtimer(CALLBACK(src, TYPE_PROC_REF(/mob/living/carbon/human, open_action), PL), 2 SECONDS)
+				return 1
 			if(CL && (CL.lockid in lock_ids))
-				addtimer(CALLBACK(src, TYPE_PROC_REF(/mob/living/carbon/human, open_action), CL), 3 SECONDS)
+				addtimer(CALLBACK(src, TYPE_PROC_REF(/mob/living/carbon/human, open_action), CL), 2 SECONDS)
+				return 1
 		else
 			emote("bumps into unseen rubble.")
+			return 0
 
 	proc/open_action(var/obj/structure/to_open)
 		if(to_open.Adjacent(src))
 			if(istype(to_open, /obj/structure/pillory))
 				var/obj/structure/pillory/PL = to_open
 				PL.togglelock(src)
+				gpt_say_logs += "You used keys on the pillory. It is now [PL.locked]"
 			if(istype(to_open, /obj/structure/closet))
 				var/obj/structure/closet/C = to_open
 				if(C.locked)
@@ -485,23 +507,30 @@ proc/strip_chars(var/string, var/remove = "() ")
 				else
 					C.close()
 				C.locked = !C.locked
+				gpt_say_logs += "You used keys on the closet. It is now [C.locked]"
 			if(istype(to_open, /obj/structure/mineral_door))
 				var/obj/structure/mineral_door/D = to_open
 				D.force_open()
 				D.locked = FALSE
+				gpt_say_logs += "You used keys on the door. It is now [D.locked]"
 
 	proc/pickup_action(var/obj/item/to_pick)
 		if(to_pick.Adjacent(src))
 			to_pick.attack_hand(src)
+			gpt_say_logs += "You picked up the [to_pick]."
 			to_pick.equip_to_best_slot(src)
 
 	proc/interact_action(var/obj/to_interact)
 		if(to_interact.Adjacent(src))
-			var/obj/item/I = usr.get_active_held_item()
+			var/obj/item/I = src.get_active_held_item()
 			if(I)
 				to_interact.attackby( I, src)
 			else
 				to_interact.attack_hand(src)
+			if(istype(to_interact, /obj/structure/mineral_door))
+				var/obj/structure/mineral_door/D = to_interact
+				if(D.locked)
+					open_action(D)
 
 	////////////////////////////////////////////////////////////
 	//  I) Gather environment in a 7x7
@@ -529,7 +558,7 @@ proc/strip_chars(var/string, var/remove = "() ")
 					result_short += "|| [T.name]"
 				var/objects = ""
 				for(var/obj/A in T)
-					objects += " [A]"
+					objects += " [A.name]"
 				if(objects != "")
 					result += " Objects:" + objects + "."
 				var/mob/living/occupant = null
