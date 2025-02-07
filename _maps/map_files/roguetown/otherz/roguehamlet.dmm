@@ -1087,6 +1087,10 @@
 	icon_state = "plating2"
 	},
 /area/rogue/outdoors/exposed/under/sewer)
+"aNp" = (
+/mob/living/carbon/human/species/orc/skilled/looter,
+/turf/open/floor/rogue/cobblerock,
+/area/rogue/indoors)
 "aND" = (
 /obj/structure/table/church,
 /turf/open/floor/rogue/church,
@@ -4082,6 +4086,10 @@
 "dew" = (
 /turf/open/floor/rogue/cobblerock_alt,
 /area/rogue/outdoors/town)
+"dex" = (
+/mob/living/carbon/human/species/human/northern/npc/farmer,
+/turf/open/floor/rogue/dirt/road,
+/area/rogue/outdoors/exposed/town)
 "deD" = (
 /obj/structure/flora/roguegrass/water,
 /obj/item/natural/dirtclod,
@@ -20824,12 +20832,9 @@
 /turf/open/floor/rogue/concrete,
 /area/rogue/indoors/town/cell)
 "pcd" = (
-/obj/effect/decal/turfedge_neu{
-	dir = 6
-	},
-/mob/living/carbon/human/species/human/northern/npc/wench,
-/turf/open/floor/rogue/cobble/mossy/alt,
-/area/rogue/indoors/town/tavern)
+/mob/living/carbon/human/species/orc/tribal,
+/turf/open/floor/rogue/ruinedwood,
+/area/rogue/outdoors/bog)
 "pch" = (
 /obj/effect/decal/remains/human/old,
 /obj/item/rogueweapon/pick,
@@ -24087,6 +24092,12 @@
 	},
 /turf/open/floor/rogue/dirt/road,
 /area/rogue/indoors/shelter/rtfield)
+"rvY" = (
+/mob/living/carbon/human/species/orc/skilled/savage,
+/turf/open/floor/rogue/dirt/road,
+/area/rogue/outdoors/rtfield{
+	ambush_mobs = list(/mob/living/simple_animal/hostile/retaliate/rogue/wolf = 50, /mob/living/carbon/human/species/human/northern/bum/ambush = 30)
+	})
 "rwF" = (
 /obj/effect/decal/turfedge_neu/mossy{
 	dir = 5
@@ -68775,7 +68786,7 @@ pUY
 wAB
 wAB
 wAB
-dZq
+dex
 wAB
 wAB
 wAB
@@ -69177,7 +69188,7 @@ pBG
 hJE
 nPt
 dZq
-dZq
+dex
 dZq
 fVl
 sNB
@@ -72244,7 +72255,7 @@ gvD
 nIa
 yiq
 tKP
-pcd
+gvD
 uNF
 dBI
 uNF
@@ -77118,7 +77129,7 @@ lif
 nAp
 eRt
 gcU
-vwv
+aNp
 cke
 lSo
 kBD
@@ -79598,7 +79609,7 @@ uTy
 aXE
 mAL
 mAL
-uTy
+rvY
 uTy
 mAL
 nAp
@@ -81231,7 +81242,7 @@ foR
 foR
 foR
 fZx
-aTX
+pcd
 sfJ
 foR
 jCK
