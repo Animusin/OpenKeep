@@ -1,6 +1,7 @@
 #define GPT_ACTION_TIMEOUT 60
 #define GPT_ROLE_TIMEOUT 600
 #define GPT_TALK_CHECK_TIMEOUT 150  // _NEW: Added constant for talk-check interval_
+#define GPT_STATUS_TIMEOUT 1200
 
 ///////////////////////////////////////////////////////////////
 // Utility: Join a list of strings with a given delimiter
@@ -38,8 +39,10 @@ proc/strip_chars(var/string, var/remove = "() ")
 		// Times (in ticks) for GPT calls
 		gpt_action_interval = GPT_ACTION_TIMEOUT  // ~5 seconds
 		gpt_role_interval   = GPT_ROLE_TIMEOUT   // ~30 seconds
+		gpt_status_interval = GPT_STATUS_TIMEOUT  // ~120 seconds
 		next_gpt_action_call = 0
 		next_gpt_role_call = 0
+		next_gpt_status_call = 0
 
 		// _NEW: Variables for GPT talking_
 		_gpt_talk_enabled = TRUE   // _NEW: Enable GPT talking_
@@ -71,19 +74,6 @@ proc/strip_chars(var/string, var/remove = "() ")
 	// Overriding process_ai to do synchronous calls
 	////////////////////////////////////////////////////////////
 	proc/process_ai_gpt()
-		if(!gpt_enabled)
-			return
-
-		// If we see no players within 20 tiles, skip
-		var/has_player_in_range = FALSE
-		for(var/mob/living/carbon/human/M in view(20, src))
-			if(M.client)
-				has_player_in_range = TRUE
-				break
-
-		if(!has_player_in_range)
-			return
-
 		// If time to refresh role
 		if(world.time >= next_gpt_role_call)
 			next_gpt_role_call = world.time + gpt_role_interval
@@ -127,7 +117,6 @@ proc/strip_chars(var/string, var/remove = "() ")
 		prompt += "RECENT ATTACKS:\n"
 		if(islist(logging[attack_key]))
 			var/list/attacks = logging[attack_key]
-			world.log << "[logging[attack_key].len]: length of logging attack_key"
 			if(attacks.len > 20)
 				attacks.Cut(1, attacks.len - 19)
 			for(var/entry in attacks[attack_key])
@@ -212,7 +201,6 @@ proc/strip_chars(var/string, var/remove = "() ")
 		role_info += "RECENT ATTACKS:\n"
 		if(islist(logging[attack_key]))
 			var/list/attacks = logging[attack_key]
-			world.log << "[logging[attack_key].len]: length of logging attack_key"
 			if(attacks.len > 20)
 				attacks.Cut(1, attacks.len - 19)
 			for(var/entry in attacks[attack_key])
@@ -315,6 +303,20 @@ proc/strip_chars(var/string, var/remove = "() ")
 		var/raw_response = file2text(content_file)
 		world.log << "[src]: Received GPT role response:\n[raw_response]"
 		gpt_personality = raw_response
+
+///////STATUS GPT
+	proc/call_gpt_status_sync()
+		var/url = "[_gpt_api_url_talk_check]?prompt=[url_encode("check status")]"
+		var/list/http_result = world.Export(url, "GET")
+		if(!http_result)
+			world.log << "[src]: GPT status request failed! No result."
+			return
+		var/status = http_result["STATUS"]
+		if(!status || copytext(status, 1, 4) != "200")
+			world.log << "[src]: GPT status request returned status [status]."
+			gpt_enabled = FALSE
+		else
+			gpt_enabled = TRUE
 
 	////////////////////////////////////////////////////////////
 	// _NEW: Synchronous call to talk check endpoint_
@@ -571,6 +573,7 @@ proc/strip_chars(var/string, var/remove = "() ")
 						result_short += " Occupant [id_str] = \"[occupant.name]\" /"
 						occupants |= occupant
 						id_counter++
+						id_str = "#[id_counter]"
 					else if(occupant == src)
 						result += "/ I am here "
 						result_short += "/ I am here "
@@ -583,6 +586,7 @@ proc/strip_chars(var/string, var/remove = "() ")
 					gpt_occupant_map[id_str] = mob
 				occupants |= mob
 				id_counter++
+				id_str = "#[id_counter]"
 		for(var/mob/living/occupant in occupants)
 			result += " Occupant [occupant.name] looks [text_join(occupant.examine(src), "\n")] \n"
 		result_short += "\n" + result
