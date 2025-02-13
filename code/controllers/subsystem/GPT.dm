@@ -1,4 +1,5 @@
 #define GPT_ACTION_TIMEOUT 60
+#define GPT_ITEM_TIMEOUT 100
 #define GPT_ROLE_TIMEOUT 600
 #define GPT_TALK_CHECK_TIMEOUT 150  // _NEW: Added constant for talk-check interval_
 #define GPT_STATUS_TIMEOUT 1200
@@ -38,9 +39,11 @@ proc/strip_chars(var/string, var/remove = "() ")
 		gpt_enabled = TRUE  // set TRUE if you want GPT AI
 		// Times (in ticks) for GPT calls
 		gpt_action_interval = GPT_ACTION_TIMEOUT  // ~5 seconds
+		gpt_item_interval = GPT_ITEM_TIMEOUT  // ~10 seconds
 		gpt_role_interval   = GPT_ROLE_TIMEOUT   // ~30 seconds
 		gpt_status_interval = GPT_STATUS_TIMEOUT  // ~120 seconds
 		next_gpt_action_call = 0
+		next_gpt_item_call = 0
 		next_gpt_role_call = 0
 		next_gpt_status_call = 0
 
@@ -64,7 +67,9 @@ proc/strip_chars(var/string, var/remove = "() ")
 		gpt_pending_args = ""
 
 		// Endpoint URLs (change IP/port as needed)
-		gpt_api_url_action = "http://127.0.0.1:5000/npc_gpt"
+		gpt_api_url_action = "http://127.0.0.1:5000/npc_gpt_action"
+		gpt_api_url_item = "http://127.0.0.1:5000/npc_gpt_item"
+
 		gpt_api_url_role   = "http://127.0.0.1:5000/npc_role"
 		// _NEW: Endpoints for GPT talking_
 		_gpt_api_url_talk_check = "http://127.0.0.1:5000/npc_talk_check"   // _NEW_
@@ -82,7 +87,12 @@ proc/strip_chars(var/string, var/remove = "() ")
 		// If time for an action prompt
 		if(world.time >= next_gpt_action_call)
 			next_gpt_action_call = world.time + gpt_action_interval
-			call_gpt_action_sync()
+			call_gpt_action_sync(gpt_api_url_action)
+
+		// If time for an item prompt
+		if(world.time >= next_gpt_item_call)
+			next_gpt_item_call = world.time + gpt_item_interval
+			call_gpt_action_sync(gpt_api_url_item)
 
 		// _NEW: Check if it’s time to evaluate whether to talk_
 		if(_gpt_talk_enabled && world.time >= _next_gpt_talk_check_call)
@@ -111,35 +121,13 @@ proc/strip_chars(var/string, var/remove = "() ")
 		prompt += "\nRECENT SPEECH: \n[saylog_text]\n\n"
 		prompt += "ENVIRONMENT (11x11 around me):\n"
 		prompt += "[env_snapshot]\n"
+		prompt += "INVENTORY: [text_join(contents, "\n")]\n"
 		// Use stringified keys (e.g., "1" for LOG_ATTACK)
 		var/attack_key = num2text(LOG_ATTACK)
 
-		prompt += "RECENT ATTACKS:\n"
-		if(islist(logging[attack_key]))
-			var/list/attacks = logging[attack_key]
-			if(attacks.len > 20)
-				attacks.Cut(1, attacks.len - 19)
-			for(var/entry in attacks[attack_key])
-				world.log << "[entry]: entry"
-				world.log << "[attacks[attack_key][entry]]: entry1"
-				prompt += "[entry]: [attacks[attack_key][entry]]\n"
-		else
-			prompt += "None.\n"
 
 		prompt += "\nENEMIES: \n[text_join(enemies, "\n")]\n\n"
-		prompt += "YOUR RECENT ACTIONS:\n[commandlog_text]\n\n"
-		prompt += "You can ONLY RESPOND in JSON:\n"
-		prompt += "{\"command\":\"COMMAND\",\"args\":\"ARG\"}\n"
-		prompt += "Valid commands: goto, pickup, interact, draw, retaliate, follow, deaggro, drop, lock.\n"
-		prompt += " - goto => '(dx,dy)'\n"
-		prompt += " - pickup => '(dx,dy), (object name)'\n"
-		prompt += " - interact => '(dx,dy), (object name)'\n"
-		prompt += " - draw => '(object name)'\n"
-		prompt += " - retaliate => '#ID'\n"
-		prompt += " - follow => '#ID'\n"
-		prompt += " - deaggro => stop fighting\n"
-		prompt += " - drop => drop held item\n"
-		prompt += " - lock => lock/unclock door/closet/pillory\n\n"
+//		prompt += "YOUR RECENT ACTIONS:\n[commandlog_text]\n\n"
 		prompt += "What do you do?\n"
 
 		return prompt
@@ -169,7 +157,12 @@ proc/strip_chars(var/string, var/remove = "() ")
 		prompt += "YOU ARE: [src.real_name]\n"
 		prompt += "YOUR PERSONALITY: [gpt_personality]\n\n"   // _NEW_
 		prompt += "RECENT SPEECH: \n[saylog_text]\n\n"   // _NEW_
+		prompt += "TIME OF DAY: [GLOB.tod]\n"
 		prompt += "ENVIRONMENT (11x11 around me):\n[env_snapshot]\n\n"   // _NEW_
+		var/commandlog_text = text_join(gpt_say_logs, "\n")
+//		prompt += "YOUR RECENT ACTIONS:\n[commandlog_text]\n\n"
+		var/attack_key = num2text(LOG_ATTACK)
+
 		prompt += "Generate a natural dialogue line for the NPC based on the above context. "   // _NEW_
 		prompt += "Return ONLY the text, with no JSON formatting.\n"   // _NEW_
 		return prompt   // _NEW_
@@ -198,17 +191,7 @@ proc/strip_chars(var/string, var/remove = "() ")
 
 		var/attack_key = num2text(LOG_ATTACK)
 
-		role_info += "RECENT ATTACKS:\n"
-		if(islist(logging[attack_key]))
-			var/list/attacks = logging[attack_key]
-			if(attacks.len > 20)
-				attacks.Cut(1, attacks.len - 19)
-			for(var/entry in attacks[attack_key])
-				world.log << "[entry]: entry"
-				world.log << "[attacks[attack_key][entry]]: entry1"
-				role_info += "[entry]: [attacks[attack_key][entry]]\n"
-		else
-			role_info += "None.\n"
+
 
 		role_info += "\nRECENT SPEECH: \n[saylog_text]\n\n"
 
@@ -222,9 +205,9 @@ proc/strip_chars(var/string, var/remove = "() ")
 	////////////////////////////////////////////////////////////
 	//  E) Synchronous call to action endpoint
 	////////////////////////////////////////////////////////////
-	proc/call_gpt_action_sync()
+	proc/call_gpt_action_sync(var/gpt_api_url)
 		var/prompt_text = build_action_prompt()
-		var/url = "[gpt_api_url_action]?prompt=[url_encode(prompt_text)]"
+		var/url = "[gpt_api_url]?prompt=[url_encode(prompt_text)]"
 		var/list/http_result = world.Export(url, "GET")
 		if(!http_result)
 			world.log << "[src]: GPT action request failed! No result."
@@ -267,7 +250,7 @@ proc/strip_chars(var/string, var/remove = "() ")
 			if(starta && enda)
 				argument = copytext_char(json_text, starta+1, enda)
 		if(!command)
-			command = "say"
+			command = "sleep"
 		if(!argument)
 			argument = "..."
 		gpt_pending_cmd = command
@@ -391,10 +374,10 @@ proc/strip_chars(var/string, var/remove = "() ")
 			var/list/coords = parse_relative_coords(coords_string)
 			if(coords.len == 2)
 				result = interact_gpt(coords[1], coords[2], object_name)
-		else if(cmd == "draw")
+		else if(cmd == "remove")
 			for(var/obj/item/I in contents)
-				if(I.name == cmd_args)
-					result = put_in_active_hand(I)
+				if(findtext(I.name, cmd_args) || findtext(cmd_args, I.name))
+					src.dropItemToGround(I)
 		else if(cmd == "lock")
 			var/list/coords = parse_relative_coords(cmd_args)
 			if(coords.len == 2)
@@ -405,6 +388,19 @@ proc/strip_chars(var/string, var/remove = "() ")
 			var/mob/living/target_mob = gpt_occupant_map[cmd_args]
 			if(target_mob)
 				result = retaliate(target_mob)
+				addtimer(CALLBACK(src, TYPE_PROC_REF(/mob/living/carbon/human, deaggro)), 10 SECONDS)
+			else
+				visible_message("[src] growls at the air, no target found.")
+		else if(cmd == "shove")
+			var/mob/living/target_mob = gpt_occupant_map[cmd_args]
+			if(target_mob)
+				result = shove(target_mob)
+			else
+				visible_message("[src] growls at the air, no target found.")
+		else if(cmd == "grab")
+			var/mob/living/target_mob = gpt_occupant_map[cmd_args]
+			if(target_mob)
+				result = grab(target_mob)
 			else
 				visible_message("[src] growls at the air, no target found.")
 		else if(cmd == "follow")
@@ -416,17 +412,38 @@ proc/strip_chars(var/string, var/remove = "() ")
 			else
 				visible_message("[src] growls at the air, no target found.")
 		else if(cmd == "deaggro")
-			back_to_idle()
-			target = null
-			enemies = list()
-		else if(cmd == "drop")
-			src.dropItemToGround(src.get_active_held_item())
+			deaggro()
+		else if(cmd == "error")
+			emote("looks confused.")
+		else if(cmd == "sleep")
+			return
 		else
 			visible_message("[src] looks confused (unknown command).")
 		gpt_say_logs += "[src]: Command:[cmd] Args:[cmd_args] Result:[result]"
 
 	proc/return_action()
 		walk(src, 0)
+
+	proc/deaggro()
+		back_to_idle()
+		target = null
+		enemies = list()
+
+	proc/shove(var/mob/living/target_mob)
+		if(target_mob.Adjacent(src))
+			src.used_intent = new /datum/intent/unarmed/shove
+			target_mob.attack_hand(src)
+			return 1
+		else
+			return 0
+
+	proc/grab(var/mob/living/target_mob)
+		if(target_mob.Adjacent(src))
+			src.used_intent = new /datum/intent/unarmed/grab
+			target_mob.attack_hand(src)
+			return 1
+		else
+			return 0
 
 	////////////////////////////////////////////////////////////
 	//  H) step_gpt to move the mob
@@ -444,8 +461,8 @@ proc/strip_chars(var/string, var/remove = "() ")
 		if(dest)
 			if(walk2derpless(dest))
 				for(var/obj/item/I in dest)
-					if(I.name == object_name)
-						addtimer(CALLBACK(src, TYPE_PROC_REF(/mob/living/carbon/human, pickup_action), I), 3 SECONDS)
+					if(findtext(I.name, object_name) || findtext(object_name, I.name))
+						addtimer(CALLBACK(src, TYPE_PROC_REF(/mob/living/carbon/human, pickup_action), I), 2 SECONDS)
 						return 1
 					else
 						emote("can't pick up [I.name].")
@@ -461,8 +478,8 @@ proc/strip_chars(var/string, var/remove = "() ")
 		if(dest)
 			if(walk2derpless(dest))
 				for(var/obj/structure/I in dest)
-					if(I.name == object_name)
-						addtimer(CALLBACK(src, TYPE_PROC_REF(/mob/living/carbon/human, interact_action), I), 3 SECONDS)
+					if(findtext(I.name, object_name) || findtext(object_name, I.name))
+						addtimer(CALLBACK(src, TYPE_PROC_REF(/mob/living/carbon/human, interact_action), I), 2 SECONDS)
 						return 1
 					else
 						emote("can't interact with [I.name].")
@@ -524,15 +541,16 @@ proc/strip_chars(var/string, var/remove = "() ")
 
 	proc/interact_action(var/obj/to_interact)
 		if(to_interact.Adjacent(src))
-			var/obj/item/I = src.get_active_held_item()
-			if(I)
-				to_interact.attackby( I, src)
-			else
-				to_interact.attack_hand(src)
 			if(istype(to_interact, /obj/structure/mineral_door))
 				var/obj/structure/mineral_door/D = to_interact
 				if(D.locked)
 					open_action(D)
+			else
+				var/obj/item/I = src.get_active_held_item()
+				if(I)
+					to_interact.attackby( I, src)
+				else
+					to_interact.attack_hand(src)
 
 	////////////////////////////////////////////////////////////
 	//  I) Gather environment in a 7x7
@@ -621,7 +639,7 @@ proc/strip_chars(var/string, var/remove = "() ")
 
 	show_message(msg, type, alt_msg, alt_type) // Message, type (1 or 2), alternative message, alt message type (1 or 2)
 		if(!client)
-			say_logs_around += "AROUND: [msg]"
+			say_logs_around += "[msg]"
 			if(say_logs_around.len > 40)
 				say_logs_around.Cut(1,2)
 		..()
@@ -679,7 +697,36 @@ proc/strip_chars(var/string, var/remove = "() ")
 
 /mob/living/carbon/human/species/human/northern/npc/prisoner
 	job_name = "Prisoner"
-	outfit = new /datum/outfit/job/roguetown/prisoner
+	outfit = new /datum/outfit/job/roguetown/prisoner_npc
+
+/datum/outfit/job/roguetown/prisoner_npc/pre_equip(mob/living/carbon/human/H)
+	..()
+	pants = /obj/item/clothing/under/roguetown/loincloth/brown
+	mask = /obj/item/clothing/mask/rogue/facemask/prisoner
+	if(H.wear_mask)
+		var/obj/I = H.wear_mask
+		H.dropItemToGround(H.wear_mask, TRUE)
+		qdel(I)
+	if(H.mind)
+		H.mind.adjust_skillrank(/datum/skill/combat/wrestling, 1, TRUE)
+		H.mind.adjust_skillrank(/datum/skill/combat/knives, 1, TRUE) // given Noble trait. N.
+		H.mind.adjust_skillrank(/datum/skill/combat/swords, 2, TRUE) // given Noble trait. N.
+		H.mind.adjust_skillrank(/datum/skill/combat/unarmed, 1, TRUE)
+		H.mind.adjust_skillrank(/datum/skill/misc/swimming, 2, TRUE)
+		H.mind.adjust_skillrank(/datum/skill/misc/athletics, 1, TRUE) // per suggestion. N.
+		H.mind.adjust_skillrank(/datum/skill/misc/reading, 2, TRUE) // given Noble trait it makes no sense they were illiterate. N.
+		H.mind.adjust_skillrank(/datum/skill/misc/climbing, 2, TRUE)
+		H.mind.adjust_skillrank(/datum/skill/misc/sneaking, 3, TRUE)
+		H.mind.adjust_skillrank(/datum/skill/misc/lockpicking, 2, TRUE)
+		H.mind.adjust_skillrank(/datum/skill/misc/riding, 1, TRUE) // per suggestion. N.
+		H.change_stat("strength", -1) // Malnutrition. N.
+		H.change_stat("perception", 2) // Few distractions, idle mind, focused senses. N.
+		H.change_stat("intelligence", 2) // Given Noble trait it makes no sense they are idiots. N.
+		H.change_stat("speed", -1)
+		H.change_stat("constitution", -1)
+		H.change_stat("endurance", -1)
+		ADD_TRAIT(H, TRAIT_BANDITCAMP, TRAIT_GENERIC)
+	ADD_TRAIT(H, TRAIT_NOBLE, TRAIT_GENERIC)
 
 /mob/living/carbon/human/species/human/northern/npc/jester
 	job_name = "Jester"
@@ -690,5 +737,5 @@ proc/strip_chars(var/string, var/remove = "() ")
 	outfit = new /datum/outfit/job/roguetown/acolyte
 
 /mob/living/carbon/human/species/human/northern/npc/wench
-	job_name = "Bath Wench"
+	job_name = "Nitemaiden"
 	outfit = new /datum/outfit/job/roguetown/nitemaiden
