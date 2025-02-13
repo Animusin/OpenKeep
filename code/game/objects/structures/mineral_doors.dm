@@ -235,6 +235,16 @@
 						SwitchState()
 			else
 				SwitchState()
+		else
+			if(ishuman(M))
+				var/mob/living/carbon/C = M
+				if(!C.handcuffed)
+					if(C.m_intent == MOVE_INTENT_SNEAK)
+						SwitchState(TRUE)
+					else
+						SwitchState()
+			else
+				SwitchState()
 	return TRUE
 
 /obj/structure/mineral_door/proc/SwitchState(silent = FALSE)

@@ -49,21 +49,27 @@
 	cmode = 1
 	update_cone_show()
 	if(stat == CONSCIOUS)
-		if(on_fire || buckled || restrained() || pulledby)
+		if((on_fire || buckled || restrained() || pulledby) && (stand_attempts < CLICK_CD_BREAKOUT))
 			resisting = TRUE
 			walk_to(src,0)
 			resist()
+			stand_attempts += CLICK_CD_RESIST
 			resisting = FALSE
-		if(!(mobility_flags & MOBILITY_STAND) && (stand_attempts < 3))
+		else
+			if(stand_attempts > 0)
+				stand_attempts -= 1
+
+		if(!(mobility_flags & MOBILITY_STAND) && (stand_attempts < CLICK_CD_BREAKOUT) && !resisting)
 			resisting = TRUE
 			npc_stand()
 			resisting = FALSE
 		else
-			stand_attempts = 0
+			if(stand_attempts > 0)
+				stand_attempts -= 1
 
-		// If we see no players within 20 tiles, skip
+		// If we see no players within 13 tiles, skip
 		var/has_player_in_range = FALSE
-		for(var/mob/living/carbon/human/M in view(20, src))
+		for(var/mob/living/carbon/human/M in view(13, src))
 			if(M.client)
 				has_player_in_range = TRUE
 				break
@@ -90,7 +96,7 @@
 
 /mob/living/carbon/human/proc/npc_stand()
 	stand_up()
-	stand_attempts += 1
+	stand_attempts += 5 SECONDS
 
 /mob/living/carbon/human/proc/npc_idle()
 	if(m_intent == MOVE_INTENT_SNEAK)
@@ -149,7 +155,7 @@
 	if(turf_of_target?.z == z)
 		if(myPath.len <= 0)
 			for(var/obj/structure/O in get_step(src,dir_to_target))
-				if(O.density && O.climbable)
+				if(O.density && O.climbable && enemies.len)
 					O.climb_structure(src)
 					myPath = list()
 					break
