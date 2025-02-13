@@ -10,9 +10,11 @@
 
 	user << browse(create_panel_helper(create_mob_html), "window=create_mob;size=425x475")
 
-/proc/randomize_human(mob/living/carbon/human/H)
+/proc/randomize_human(mob/living/carbon/human/H, var/gender_override = null)
 	set waitfor = 0
 	H.gender = pick(MALE, FEMALE)
+	if(gender_override)
+		H.gender = gender_override
 	H.real_name = random_unique_name(H.gender)
 	H.name = H.real_name
 	H.underwear = random_underwear(H.gender)

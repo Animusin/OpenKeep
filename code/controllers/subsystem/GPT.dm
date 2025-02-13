@@ -662,6 +662,7 @@ proc/strip_chars(var/string, var/remove = "() ")
 
 	wander = FALSE
 	var/outlaw
+	var/gender_override
 
 /mob/living/carbon/human/species/human/northern/npc/should_target(mob/living/L)
 	if(L.stat != CONSCIOUS)
@@ -670,6 +671,8 @@ proc/strip_chars(var/string, var/remove = "() ")
 
 /mob/living/carbon/human/species/human/northern/npc/Initialize()
 	. = ..()
+	if(gender_override)
+		randomize_human(src,gender_override)
 	set_species(/datum/species/human/northern)
 	addtimer(CALLBACK(src, PROC_REF(after_creation)), 1 SECONDS)
 
@@ -739,3 +742,4 @@ proc/strip_chars(var/string, var/remove = "() ")
 /mob/living/carbon/human/species/human/northern/npc/wench
 	job_name = "Nitemaiden"
 	outfit = new /datum/outfit/job/roguetown/nitemaiden
+	gender_override = FEMALE
