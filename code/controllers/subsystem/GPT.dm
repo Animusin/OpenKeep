@@ -1,6 +1,7 @@
 #define GPT_ACTION_TIMEOUT 60
 #define GPT_ITEM_TIMEOUT 100
-#define GPT_ROLE_TIMEOUT 600
+#define GPT_ROLE_TIMEOUT 1200
+#define GPT_COMMAND_TIMEOUT 450
 #define GPT_TALK_CHECK_TIMEOUT 150  // _NEW: Added constant for talk-check interval_
 #define GPT_STATUS_TIMEOUT 1200
 
@@ -41,10 +42,12 @@ proc/strip_chars(var/string, var/remove = "() ")
 		gpt_action_interval = GPT_ACTION_TIMEOUT  // ~5 seconds
 		gpt_item_interval = GPT_ITEM_TIMEOUT  // ~10 seconds
 		gpt_role_interval   = GPT_ROLE_TIMEOUT   // ~30 seconds
+		gpt_command_interval   = GPT_COMMAND_TIMEOUT   // ~30 seconds
 		gpt_status_interval = GPT_STATUS_TIMEOUT  // ~120 seconds
 		next_gpt_action_call = 0
 		next_gpt_item_call = 0
 		next_gpt_role_call = 0
+		next_gpt_command_call = 0
 		next_gpt_status_call = 0
 
 		// _NEW: Variables for GPT talking_
@@ -65,12 +68,15 @@ proc/strip_chars(var/string, var/remove = "() ")
 		// Where we store GPT's next command
 		gpt_pending_cmd = ""
 		gpt_pending_args = ""
+		high_command = ""
+		description = ""
 
 		// Endpoint URLs (change IP/port as needed)
 		gpt_api_url_action = "http://127.0.0.1:5000/npc_gpt_action"
 		gpt_api_url_item = "http://127.0.0.1:5000/npc_gpt_item"
 
 		gpt_api_url_role   = "http://127.0.0.1:5000/npc_role"
+		gpt_api_url_command = "http://127.0.0.1:5000/npc_command"
 		// _NEW: Endpoints for GPT talking_
 		_gpt_api_url_talk_check = "http://127.0.0.1:5000/npc_talk_check"   // _NEW_
 		_gpt_api_url_talk = "http://127.0.0.1:5000/npc_talk"   // _NEW_
@@ -83,6 +89,11 @@ proc/strip_chars(var/string, var/remove = "() ")
 		if(world.time >= next_gpt_role_call)
 			next_gpt_role_call = world.time + gpt_role_interval
 			call_gpt_role_sync()
+
+		// If time to refresh command
+		if(world.time >= next_gpt_command_call)
+			next_gpt_command_call = world.time + gpt_command_interval
+			call_gpt_command_sync()
 
 		// If time for an action prompt
 		if(world.time >= next_gpt_action_call)
@@ -117,10 +128,11 @@ proc/strip_chars(var/string, var/remove = "() ")
 		// Combine our existing 'personality' + environment + instructions
 		var/prompt = ""
 		prompt += "YOU ARE: [src.real_name]\n"
-		prompt += "YOUR PERSONALITY:[gpt_personality]\n\n"
-		prompt += "\nRECENT SPEECH: \n[saylog_text]\n\n"
+		prompt += "YOUR PERSONALITY:[description]\n[gpt_personality]\n\n"
+		prompt += "\nRECENT EVENTS: \n[saylog_text]\n\n"
 		prompt += "ENVIRONMENT (11x11 around me):\n"
 		prompt += "[env_snapshot]\n"
+		prompt += "\nHigh-order command: \n[high_command]\n\n"
 		prompt += "INVENTORY: [text_join(contents, "\n")]\n"
 		// Use stringified keys (e.g., "1" for LOG_ATTACK)
 		var/attack_key = num2text(LOG_ATTACK)
@@ -140,9 +152,10 @@ proc/strip_chars(var/string, var/remove = "() ")
 		var/saylog_text = text_join(say_logs_around, "\n")   // _NEW_
 		var/prompt = ""   // _NEW_
 		prompt += "YOU ARE: [src.real_name]\n"
-		prompt += "YOUR PERSONALITY: [gpt_personality]\n\n"   // _NEW_
-		prompt += "RECENT SPEECH: \n[saylog_text]\n\n"   // _NEW_
+		prompt += "YOUR PERSONALITY: [description]\n[gpt_personality]\n\n"   // _NEW_
+		prompt += "RECENT EVENTS: \n[saylog_text]\n\n"   // _NEW_
 		prompt += "ENVIRONMENT (11x11 around me):\n[env_snapshot]\n\n"   // _NEW_
+		prompt += "\nHigh-order command: \n[high_command]\n\n"
 		prompt += "Based on the current context, do you need to say something to interact with someone? "   // _NEW_
 		prompt += "Answer ONLY with YES or NO.\n"   // _NEW_
 		return prompt   // _NEW_
@@ -155,10 +168,11 @@ proc/strip_chars(var/string, var/remove = "() ")
 		var/saylog_text = text_join(say_logs_around, "\n")   // _NEW_
 		var/prompt = ""   // _NEW_
 		prompt += "YOU ARE: [src.real_name]\n"
-		prompt += "YOUR PERSONALITY: [gpt_personality]\n\n"   // _NEW_
-		prompt += "RECENT SPEECH: \n[saylog_text]\n\n"   // _NEW_
+		prompt += "YOUR PERSONALITY: [description]\n[gpt_personality]\n\n"   // _NEW_
+		prompt += "RECENT EVENTS: \n[saylog_text]\n\n"   // _NEW_
 		prompt += "TIME OF DAY: [GLOB.tod]\n"
 		prompt += "ENVIRONMENT (11x11 around me):\n[env_snapshot]\n\n"   // _NEW_
+		prompt += "\nHigh-order command: \n[high_command]\n\n"
 		var/commandlog_text = text_join(gpt_say_logs, "\n")
 //		prompt += "YOUR RECENT ACTIONS:\n[commandlog_text]\n\n"
 		var/attack_key = num2text(LOG_ATTACK)
@@ -177,7 +191,7 @@ proc/strip_chars(var/string, var/remove = "() ")
 		*/
 		var/role_info = ""
 		role_info += "YOU ARE: [src.real_name]\n"
-		role_info += "Personality: [gpt_personality]\n"
+		role_info += "Personality: [description]\n[gpt_personality]\n"
 		role_info += "Assigned Role: [mind?.assigned_role]\n"
 		role_info += "Real Name: [real_name]\n"
 		role_info += "Species: [dna.species]\n"
@@ -193,10 +207,46 @@ proc/strip_chars(var/string, var/remove = "() ")
 
 
 
-		role_info += "\nRECENT SPEECH: \n[saylog_text]\n\n"
+		role_info += "\nRECENT EVENTS: \n[saylog_text]\n\n"
 
 		var/prompt = ""
-		prompt += "Create a short description of an NPC in a medieval fantasy environment. Base on the Personality if there is any. Add short summary of their last interactions.\n"
+		prompt += "Create a short description of an character in a medieval fantasy environment. Base on the Personality if there is any.\n"
+		prompt += "[role_info]\n\n"
+		prompt += "Return ONLY the text. No extra JSON.\n"
+
+		return prompt
+
+	////////////////////////////////////////////////////////////
+	//  I) Build the Command Prompt
+	////////////////////////////////////////////////////////////
+	proc/build_command_prompt()
+		/*
+		  If your codebase doesn’t have assigned_role, real_name,
+		  species, contents, health, define them or adapt as needed.
+		*/
+		var/role_info = ""
+		role_info += "YOU ARE: [src.real_name]\n"
+		role_info += "Personality: [description]\n[gpt_personality]\n"
+		role_info += "Assigned Role: [mind?.assigned_role]\n"
+		role_info += "Real Name: [real_name]\n"
+		role_info += "Species: [dna.species]\n"
+		role_info += "Health: [health]\n"
+		role_info += "Inventory: [contents]\n"
+		role_info += "Look and clothing: [text_join(src.examine(src), "\n")]\n"
+
+		var/commandlog_text = text_join(gpt_say_logs, "\n")
+		role_info += "YOUR RECENT ACTIONS:\n[commandlog_text]\n\n"
+		var/saylog_text = text_join(say_logs_around, "\n")
+
+		var/attack_key = num2text(LOG_ATTACK)
+
+
+
+		role_info += "\nRECENT EVENTS: \n[saylog_text]\n\n"
+		role_info += "\nPrevious high-order command: \n[high_command]\n\n"
+
+		var/prompt = ""
+		prompt += "Create a high-order command for an NPC in a medieval fantasy environment.\n"
 		prompt += "[role_info]\n\n"
 		prompt += "Return ONLY the text. No extra JSON.\n"
 
@@ -218,7 +268,7 @@ proc/strip_chars(var/string, var/remove = "() ")
 			return
 		var/content_file = http_result["CONTENT"]
 		if(!content_file)
-			world.log << "[src]: GPT action request had no CONTENT!"
+			world.log << "[src]: GPT action request had  CONTENT!"
 			return
 		var/raw_response = file2text(content_file)
 		var/raw_response_fixed = replacetext_char(raw_response, "\\\"", "\"")
@@ -286,6 +336,28 @@ proc/strip_chars(var/string, var/remove = "() ")
 		var/raw_response = file2text(content_file)
 		world.log << "[src]: Received GPT role response:\n[raw_response]"
 		gpt_personality = raw_response
+
+	////////////////////////////////////////////////////////////
+	//  K) Synchronous call to command endpoint
+	////////////////////////////////////////////////////////////
+	proc/call_gpt_command_sync()
+		var/prompt_text = build_command_prompt()
+		var/url = "[gpt_api_url_command]?prompt=[url_encode(prompt_text)]"
+		var/list/http_result = world.Export(url, "GET")
+		if(!http_result)
+			world.log << "[src]: GPT command request failed! No result."
+			return
+		var/status = http_result["STATUS"]
+		if(!status || copytext(status, 1, 4) != "200")
+			world.log << "[src]: GPT command request returned status [status]."
+			return
+		var/content_file = http_result["CONTENT"]
+		if(!content_file)
+			world.log << "[src]: GPT command request had no CONTENT!"
+			return
+		var/raw_response = file2text(content_file)
+		world.log << "[src]: Received GPT command response:\n[raw_response]"
+		high_command = raw_response
 
 ///////STATUS GPT
 	proc/call_gpt_status_sync()
@@ -388,7 +460,7 @@ proc/strip_chars(var/string, var/remove = "() ")
 			var/mob/living/target_mob = gpt_occupant_map[cmd_args]
 			if(target_mob)
 				result = retaliate(target_mob)
-				addtimer(CALLBACK(src, TYPE_PROC_REF(/mob/living/carbon/human, deaggro)), 10 SECONDS)
+				addtimer(CALLBACK(src, TYPE_PROC_REF(/mob/living/carbon/human, deaggro)), 5 SECONDS)
 			else
 				visible_message("[src] growls at the air, no target found.")
 		else if(cmd == "shove")
@@ -545,6 +617,13 @@ proc/strip_chars(var/string, var/remove = "() ")
 				var/obj/structure/mineral_door/D = to_interact
 				if(D.locked)
 					open_action(D)
+					return
+				if(!D.door_opened)
+					D.force_open()
+					return
+				else
+					D.force_closed()
+					return
 			else
 				var/obj/item/I = src.get_active_held_item()
 				if(I)
@@ -689,18 +768,22 @@ proc/strip_chars(var/string, var/remove = "() ")
 /mob/living/carbon/human/species/human/northern/npc/servant
 	job_name = "Servant"
 	outfit = new /datum/outfit/job/roguetown/servant
+	description = "A servant of the town and directly the Lord."
 
 /mob/living/carbon/human/species/human/northern/npc/farmer
 	job_name = "Soilson"
 	outfit = new /datum/outfit/job/roguetown/farmer
+	description = "A farmer of the town."
 
 /mob/living/carbon/human/species/human/northern/npc/watchman
 	job_name = "Watchman"
 	outfit = new /datum/outfit/job/roguetown/watchman
+	description = "A watchman of the town."
 
 /mob/living/carbon/human/species/human/northern/npc/prisoner
 	job_name = "Prisoner"
 	outfit = new /datum/outfit/job/roguetown/prisoner_npc
+	description = "A prisoner of the town."
 
 /datum/outfit/job/roguetown/prisoner_npc/pre_equip(mob/living/carbon/human/H)
 	..()
@@ -734,12 +817,15 @@ proc/strip_chars(var/string, var/remove = "() ")
 /mob/living/carbon/human/species/human/northern/npc/jester
 	job_name = "Jester"
 	outfit = new /datum/outfit/job/roguetown/jester
+	description = "A jester of the Lord's court."
 
 /mob/living/carbon/human/species/human/northern/npc/acolyte
 	job_name = "Acolyte"
 	outfit = new /datum/outfit/job/roguetown/acolyte
+	description = "An acolyte of the local church."
 
 /mob/living/carbon/human/species/human/northern/npc/wench
 	job_name = "Nitemaiden"
 	outfit = new /datum/outfit/job/roguetown/nitemaiden
 	gender_override = FEMALE
+	description = "A wench of the local bath."
