@@ -95,26 +95,26 @@
 		return
 
 	var/datum/patron/A = H.patron
-	var/list/spelllist = list(A.t0, A.t1)
+	var/list/spelllist = list(A.t0, A.t1, A.t2)
 	for(var/spell_type in spelllist)
 		if(!spell_type || H.mind.has_spell(spell_type))
 			continue
 		H.mind.AddSpell(new spell_type)
 	level = CLERIC_T2
-	max_devotion += 100
+	max_devotion += 200
 
 /datum/devotion/cleric_holder/proc/grant_spells_cleric(mob/living/carbon/human/H)
 	if(!H || !H.mind)
 		return
 
 	var/datum/patron/A = H.patron
-	var/list/spelllist = list(A.t0, A.t1)
+	var/list/spelllist = list(A.t0, A.t1, A.t2)
 	for(var/spell_type in spelllist)
 		if(!spell_type || H.mind.has_spell(spell_type))
 			continue
 		H.mind.AddSpell(new spell_type)
 	level = CLERIC_T2
-	max_devotion += 100
+	max_devotion += 200
 
 /datum/devotion/cleric_holder/proc/grant_spells_templar(mob/living/carbon/human/H)
 	if(!H || !H.mind)
@@ -187,4 +187,4 @@
 			continue
 		H.mind.AddSpell(new spell_type)
 	level = CLERIC_T0
-	max_devotion = 150
+	max_devotion = 200

@@ -81,6 +81,11 @@
 			head = /obj/item/clothing/head/roguetown/roguehood/black
 			neck = /obj/item/clothing/neck/roguetown/psycross/silver/malum
 			armor = /obj/item/clothing/suit/roguetown/shirt/robe/malum
+		if("Abyssor")
+			armor = /obj/item/clothing/suit/roguetown/shirt/robe/shrinekeeper
+			neck = /obj/item/clothing/neck/roguetown/psycross/silver
+			head = /obj/item/clothing/head/roguetown/roguehood/priest
+
 	if(H.mind)
 		H.mind.adjust_skillrank(/datum/skill/misc/reading, 5, TRUE)
 		H.mind.adjust_skillrank(/datum/skill/magic/holy, 4, TRUE)
