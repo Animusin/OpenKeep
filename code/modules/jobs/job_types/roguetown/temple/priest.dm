@@ -8,13 +8,7 @@
 	spawn_positions = 1
 
 	f_title = "Priestess"
-	allowed_races = list(
-		"Humen",
-		"Elf",
-		"Half-Elf",
-		"Dwarf",
-		"Aasimar"
-	)
+	allowed_races = ALL_PLAYER_RACES_BY_NAME
 	allowed_patrons = ALL_CLERIC_PATRONS
 	tutorial = "The Divine is all that matters in a world of the immoral. The Weeping god left his children to rule over us mortals and you will preach their wisdom to any who still heed their will. The faithless are growing in number, it is up to you to shepard them to a God-Fearing future."
 	whitelist_req = TRUE
